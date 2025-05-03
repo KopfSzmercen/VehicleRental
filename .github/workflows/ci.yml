@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [main]
 
+# Add permissions for the test reporter
 permissions:
   checks: write
   pull-requests: write
@@ -34,10 +35,10 @@ jobs:
 
       - name: Report Unit Test Results
         uses: dorny/test-reporter@v1
-        if: always()
+        if: always() # Run this step even if tests fail
         with:
           name: Unit Tests Results
-          path: unit-test-results.trx
+          path: VehicleRental/Tests/VehicleRental.Tests.Unit/unit-test-results.trx
           reporter: dotnet-trx
           fail-on-error: "true"
 
@@ -46,9 +47,9 @@ jobs:
 
       - name: Report Integration Test Results
         uses: dorny/test-reporter@v1
-        if: always()
+        if: always() # Run this step even if tests fail
         with:
           name: Integration Tests Results
-          path: integration-test-results.trx
+          path: VehicleRental/Tests/VehicleRental.Tests.Integration/integration-test-results.trx
           reporter: dotnet-trx
           fail-on-error: "true"
