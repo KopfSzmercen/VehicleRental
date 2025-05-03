@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental", "VehicleRental\VehicleRental.csproj", "{5527CC08-DCE0-48CD-B1DB-7A04F9D1EDFF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6A463EC6-3326-4A83-93B0-9BD541935093}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental.Tests.Integration", "Tests\VehicleRental.Tests.Integration\VehicleRental.Tests.Integration.csproj", "{4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental.Tests.Unit", "VehicleRental.Tests.Unit\VehicleRental.Tests.Unit.csproj", "{6A4B2E4F-5683-4006-BB18-5E87A1EB4B27}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5527CC08-DCE0-48CD-B1DB-7A04F9D1EDFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5527CC08-DCE0-48CD-B1DB-7A04F9D1EDFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5527CC08-DCE0-48CD-B1DB-7A04F9D1EDFF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5527CC08-DCE0-48CD-B1DB-7A04F9D1EDFF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A4B2E4F-5683-4006-BB18-5E87A1EB4B27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A4B2E4F-5683-4006-BB18-5E87A1EB4B27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A4B2E4F-5683-4006-BB18-5E87A1EB4B27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A4B2E4F-5683-4006-BB18-5E87A1EB4B27}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C} = {6A463EC6-3326-4A83-93B0-9BD541935093}
+		{6A4B2E4F-5683-4006-BB18-5E87A1EB4B27} = {6A463EC6-3326-4A83-93B0-9BD541935093}
+	EndGlobalSection
+EndGlobal
