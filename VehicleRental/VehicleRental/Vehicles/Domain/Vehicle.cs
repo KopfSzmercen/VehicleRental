@@ -4,6 +4,8 @@ namespace VehicleRental.Vehicles.Domain;
 
 internal sealed class Vehicle
 {
+    private List<VehicleLegalDocument> _legalDocuments = [];
+
     private Vehicle()
     {
     }
@@ -20,7 +22,11 @@ internal sealed class Vehicle
 
     public DateTimeOffset? UpdatedAt { get; private set; }
 
-    public GeoLocalization CurrentGeoLocalization { get; private set; } = null!;
+    public GeoLocalization? CurrentGeoLocalization { get; private set; }
+
+    public IReadOnlyList<VehicleLegalDocument> LegalDocuments => _legalDocuments.AsReadOnly();
+
+    public bool IsAvailableForRental { get; private set; }
 
     public static Vehicle CreateNew(
         string name,
@@ -46,8 +52,45 @@ internal sealed class Vehicle
             RegistrationNumber = registrationNumber,
             Status = VehicleStatus.InVerification,
             CurrentGeoLocalization = geoLocalization,
-            CreatedAt = now
+            CreatedAt = now,
+            IsAvailableForRental = false,
+            _legalDocuments = []
         };
+    }
+
+    public void MakeAvailable(DateTimeOffset now)
+    {
+        if (Status is not VehicleStatus.Archived)
+            throw new BusinessRuleValidationException("Can not modifty archived vehicle.");
+
+        if (_legalDocuments.Count == 0)
+            throw new BusinessRuleValidationException(
+                "To make available vehicle must have at least one legal document.");
+
+        Status = VehicleStatus.Available;
+        UpdatedAt = now;
+    }
+
+    public void Archive(DateTimeOffset now)
+    {
+        IsAvailableForRental = false;
+        Status = VehicleStatus.Archived;
+        UpdatedAt = now;
+        CurrentGeoLocalization = null;
+    }
+
+    public void PutToMaintenance(DateTimeOffset now)
+    {
+        if (Status is not VehicleStatus.Available)
+            throw new BusinessRuleValidationException("Can not put vehicle to maintenance.");
+
+        Status = VehicleStatus.InMaintenance;
+        UpdatedAt = now;
+    }
+
+    public void AddLegalDocument(VehicleLegalDocument legalDocument)
+    {
+        _legalDocuments.Add(legalDocument);
     }
 
     public void UpdateGeoLocalization(GeoLocalization geoLocalization)
