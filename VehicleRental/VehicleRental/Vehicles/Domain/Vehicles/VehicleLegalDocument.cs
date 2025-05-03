@@ -1,6 +1,6 @@
 using VehicleRental.Common.ErrorHandling;
 
-namespace VehicleRental.Vehicles.Domain;
+namespace VehicleRental.Vehicles.Domain.Vehicles;
 
 public sealed class VehicleLegalDocument
 {

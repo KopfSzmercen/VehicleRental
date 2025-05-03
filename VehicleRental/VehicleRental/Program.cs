@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using VehicleRental.Persistence;
 using VehicleRental.Users;
+using VehicleRental.Vehicles;
 
 [assembly: InternalsVisibleTo("VehicleRental.Tests.Integration")]
 [assembly: InternalsVisibleTo("VehicleRental.Tests.Unit")]
@@ -12,6 +13,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddPersistence(builder.Configuration);
 
 builder.Services.AddUsersModule(builder.Configuration);
+builder.Services.AddVehiclesModule(builder.Configuration); // Add this line
 
 var app = builder.Build();
 
@@ -24,6 +26,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseUsersModule();
+app.UseVehiclesModule(); // Add this line
 
 await app.ApplyMigrations();
 

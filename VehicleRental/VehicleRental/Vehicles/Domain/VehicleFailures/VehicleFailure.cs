@@ -1,6 +1,6 @@
 using VehicleRental.Common.ErrorHandling;
 
-namespace VehicleRental.Vehicles.Domain;
+namespace VehicleRental.Vehicles.Domain.VehicleFailures;
 
 internal sealed class VehicleFailure
 {

@@ -1,6 +1,6 @@
 using VehicleRental.Common.ErrorHandling;
 
-namespace VehicleRental.Vehicles.Domain;
+namespace VehicleRental.Vehicles.Domain.Vehicles;
 
 internal sealed class Vehicle
 {
@@ -60,8 +60,8 @@ internal sealed class Vehicle
 
     public void MakeAvailable(DateTimeOffset now)
     {
-        if (Status is not VehicleStatus.Archived)
-            throw new BusinessRuleValidationException("Can not modifty archived vehicle.");
+        if (Status is VehicleStatus.Archived)
+            throw new BusinessRuleValidationException("Can not modify archived vehicle.");
 
         if (_legalDocuments.Count == 0)
             throw new BusinessRuleValidationException(

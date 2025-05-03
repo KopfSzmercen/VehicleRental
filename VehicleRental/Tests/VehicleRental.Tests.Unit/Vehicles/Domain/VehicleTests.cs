@@ -1,6 +1,7 @@
 using Shouldly;
 using VehicleRental.Common.ErrorHandling;
 using VehicleRental.Vehicles.Domain;
+using VehicleRental.Vehicles.Domain.Vehicles;
 
 namespace VehicleTests.Tests.Unit.Vehicles.Domain;
 
@@ -107,7 +108,6 @@ public class VehicleTests
     {
         // Arrange
         var vehicle = CreateValidVehicle();
-        vehicle.Archive(_now); // Archive the vehicle first
 
         // Act & Assert
         Should.Throw<BusinessRuleValidationException>(() => vehicle.MakeAvailable(_now));
@@ -121,7 +121,6 @@ public class VehicleTests
         var vehicle = CreateValidVehicle();
         var legalDocument = CreateValidLegalDocument();
         vehicle.AddLegalDocument(legalDocument);
-        vehicle.Archive(_now); // Archive the vehicle first
         var makeAvailableTime = _now.AddSeconds(1);
 
         // Act
@@ -133,20 +132,6 @@ public class VehicleTests
     }
 
     [Fact]
-    public void MakeAvailable_WhenVehicleIsNotArchived_ShouldThrowBusinessRuleValidationException()
-    {
-        // Arrange
-        var vehicle = CreateValidVehicle();
-        var legalDocument = CreateValidLegalDocument();
-        vehicle.AddLegalDocument(legalDocument);
-        // Vehicle is InVerification initially
-
-        // Act & Assert
-        Should.Throw<BusinessRuleValidationException>(() => vehicle.MakeAvailable(_now));
-    }
-
-
-    [Fact]
     public void Archive_ShouldSetStatusToArchivedAndClearLocalization()
     {
         // Arrange
@@ -154,8 +139,6 @@ public class VehicleTests
         // Simulate making it available first
         var legalDocument = CreateValidLegalDocument();
         vehicle.AddLegalDocument(legalDocument);
-        // Need to archive first to make available
-        vehicle.Archive(_now.AddSeconds(-10));
         vehicle.MakeAvailable(_now.AddSeconds(-5));
 
         var archiveTime = _now;
@@ -177,9 +160,7 @@ public class VehicleTests
         var vehicle = CreateValidVehicle();
         var legalDocument = CreateValidLegalDocument();
         vehicle.AddLegalDocument(legalDocument);
-        // Need to archive first to make available
-        vehicle.Archive(_now.AddSeconds(-10));
-        vehicle.MakeAvailable(_now.AddSeconds(-5)); // Status is now Available
+        vehicle.MakeAvailable(_now.AddSeconds(-5));
         var maintenanceTime = _now;
 
         // Act

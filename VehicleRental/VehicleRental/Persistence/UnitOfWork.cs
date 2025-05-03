@@ -12,3 +12,11 @@ internal sealed class UnitOfWork(AppDbContext context) : IUnitOfWork
         await context.SaveChangesAsync(cancellationToken);
     }
 }
+
+internal sealed class InMemoryUnitOfWork : IUnitOfWork
+{
+    public Task SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return Task.CompletedTask;
+    }
+}

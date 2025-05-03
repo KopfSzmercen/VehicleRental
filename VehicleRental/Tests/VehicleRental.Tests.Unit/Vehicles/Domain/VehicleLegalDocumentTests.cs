@@ -1,6 +1,6 @@
 using Shouldly;
 using VehicleRental.Common.ErrorHandling;
-using VehicleRental.Vehicles.Domain;
+using VehicleRental.Vehicles.Domain.Vehicles;
 
 namespace VehicleTests.Tests.Unit.Vehicles.Domain;
 

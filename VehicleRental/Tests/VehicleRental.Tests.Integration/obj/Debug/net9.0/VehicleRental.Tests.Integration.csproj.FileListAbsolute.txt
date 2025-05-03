@@ -556,3 +556,4 @@
 /home/komp/PersonalProjects/VehicleRental/VehicleRental/Tests/VehicleRental.Tests.Integration/obj/Debug/net9.0/VehicleRental.Tests.Integration.pdb
 /home/komp/PersonalProjects/VehicleRental/VehicleRental/Tests/VehicleRental.Tests.Integration/obj/Debug/net9.0/VehicleRental.Tests.Integration.genruntimeconfig.cache
 /home/komp/PersonalProjects/VehicleRental/VehicleRental/Tests/VehicleRental.Tests.Integration/obj/Debug/net9.0/ref/VehicleRental.Tests.Integration.dll
+/home/komp/PersonalProjects/VehicleRental/VehicleRental/Tests/VehicleRental.Tests.Integration/obj/Debug/net9.0/VehicleRental.Tests.Integration.sourcelink.json

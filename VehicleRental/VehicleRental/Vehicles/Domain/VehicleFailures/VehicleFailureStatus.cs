@@ -1,4 +1,4 @@
-namespace VehicleRental.Vehicles.Domain;
+namespace VehicleRental.Vehicles.Domain.VehicleFailures;
 
 public enum VehicleFailureStatus
 {

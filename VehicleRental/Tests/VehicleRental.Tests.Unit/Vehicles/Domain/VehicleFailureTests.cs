@@ -1,17 +1,19 @@
 using Shouldly;
 using VehicleRental.Common.ErrorHandling;
-using VehicleRental.Vehicles.Domain;
+using VehicleRental.Vehicles.Domain.VehicleFailures;
 
 namespace VehicleTests.Tests.Unit.Vehicles.Domain;
 
 public class VehicleFailureTests
 {
+    private readonly Guid _creatorId = Guid.NewGuid();
     private readonly DateTimeOffset _now = DateTimeOffset.UtcNow;
     private readonly Guid _vehicleId = Guid.NewGuid();
-    private readonly Guid _creatorId = Guid.NewGuid();
 
-    private VehicleFailure CreateValidVehicleFailure() =>
-        VehicleFailure.CreateNew("Engine Failure", _vehicleId, _creatorId, _now);
+    private VehicleFailure CreateValidVehicleFailure()
+    {
+        return VehicleFailure.CreateNew("Engine Failure", _vehicleId, _creatorId, _now);
+    }
 
     [Fact]
     public void CreateNew_WithValidData_ShouldSucceed()
