@@ -32,6 +32,9 @@ app.UseAuthorization();
 
 await app.RunAsync();
 
-public partial class Program
+namespace VehicleRental
 {
+    public class Program
+    {
+    }
 }

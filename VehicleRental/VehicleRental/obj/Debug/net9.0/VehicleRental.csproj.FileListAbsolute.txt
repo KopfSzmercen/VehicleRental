@@ -155,3 +155,4 @@
 /home/komp/PersonalProjects/VehicleRental/VehicleRental/VehicleRental/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerUI.dll
 /home/komp/PersonalProjects/VehicleRental/VehicleRental/VehicleRental/bin/Debug/net9.0/Swashbuckle.AspNetCore.Swagger.dll
 /home/komp/PersonalProjects/VehicleRental/VehicleRental/VehicleRental/bin/Debug/net9.0/Swashbuckle.AspNetCore.SwaggerGen.dll
+/home/komp/PersonalProjects/VehicleRental/VehicleRental/VehicleRental/obj/Debug/net9.0/VehicleRental.sourcelink.json

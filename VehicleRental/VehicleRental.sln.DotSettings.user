@@ -5,10 +5,5 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ARespawner_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FSourcesCache_003Fbbef462f6f72d544182252a579c5c179ad2f92c25c0f52f592266b3fd71933_003FRespawner_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AUserManager_00601_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F97eefac9fbf54a7aaf346402b65b484c6a800_003F21_003Fa81c8974_003FUserManager_00601_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=7c535602_002D8077_002D47fe_002D88e5_002Db4055db8db04/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GivenEmailIsUnique_RegisterUser_ShouldSucceed" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C::net9.0::VehicleRental.Tests.Integration.Users.RegisterUserTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C::net9.0::VehicleRental.Tests.Integration.Users.SignInTests.GivenUserIsRegistered_SignIn_ShouldSucceed&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C::net9.0::VehicleRental.Tests.Integration.Users.GetMeTests.GivenUserIsSignedIn_GetMe_ShouldSucceed&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Users.Infrastructure.Tokens.TokensManagerTests.ItShouldGenerateJwt&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
+  &lt;Project Location="/home/komp/PersonalProjects/VehicleRental/VehicleRental" Presentation="&amp;lt;Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
