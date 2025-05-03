@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  checks: write
+  pull-requests: write
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -26,7 +30,25 @@ jobs:
         run: dotnet build VehicleRental/VehicleRental.sln --no-restore
 
       - name: Run Unit Tests
-        run: dotnet test VehicleRental/Tests/VehicleRental.Tests.Unit/VehicleRental.Tests.Unit.csproj --no-build --verbosity normal
+        run: dotnet test VehicleRental/Tests/VehicleRental.Tests.Unit/VehicleRental.Tests.Unit.csproj --no-build --verbosity normal --logger "trx;LogFileName=unit-test-results.trx"
+
+      - name: Report Unit Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Tests Results
+          path: unit-test-results.trx
+          reporter: dotnet-trx
+          fail-on-error: "true"
 
       - name: Run Integration Tests
-        run: dotnet test VehicleRental/Tests/VehicleRental.Tests.Integration/VehicleRental.Tests.Integration.csproj --no-build --verbosity normal
+        run: dotnet test VehicleRental/Tests/VehicleRental.Tests.Integration/VehicleRental.Tests.Integration.csproj --no-build --verbosity normal --logger "trx;LogFileName=integration-test-results.trx"
+
+      - name: Report Integration Test Results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Integration Tests Results
+          path: integration-test-results.trx
+          reporter: dotnet-trx
+          fail-on-error: "true"
