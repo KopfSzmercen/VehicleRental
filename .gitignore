@@ -1,0 +1,232 @@
+# .NET specific ignores
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio files
+.vs/
+.vscode/
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+*.user
+*.userosscache
+*.suo
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.pfx
+*.publishsettings
+orleans.codegen.cs
+
+# Benchmark Results
+BenchmarkDotNet.Artifacts/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Node.js specific ignores
+## Logs
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+## Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+## Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+## Dependency directories
+node_modules/
+jspm_packages/
+
+## TypeScript cache
+*.tsbuildinfo
+
+## Optional npm cache directory
+.npm
+
+## Optional eslint cache
+.eslintcache
+
+## Optional stylelint cache
+.stylelintcache
+
+## Optional REPL history
+.node_repl_history
+
+## Output of 'npm pack'
+*.tgz
+
+## Yarn Integrity file
+.yarn-integrity
+
+## dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
+
+## yarn v2+
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# React specific
+/build
+/dist
+/coverage
+
+# Docker specific
+.dockerignore
+
+# Azure specific
+*.pubxml
+*.pubxml.user
+.azure/
+
+# OS specific ignores
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+## Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+## Linux
+*~
+.directory
+.Trash-*
+
+# IDE specific files
+## JetBrains Rider
+.idea/
+*.sln.iml
+*.iws
+*.iml
+*.ipr
+out/
+
+## Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+.history/
+
+# Project specific
+## Local development settings
+appsettings.Development.json
+appsettings.*.Development.json
+local.settings.json
+test-results/
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+*.tfvars
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Bicep
+*.bicepparam
+
+# Secrets and keys files (just in case)
+*.key
+*.pem
+*.crt
+*.pfx
+*.p12
+secrets.json
+**/secrets/
+
+# Database files
+*.mdf
+*.ldf
+*.ndf
+*.sqlite
+*.sqlite3
+
+# Log files
+*.log
+*.log.*
+npm-debug.log*
+
+# Temporary files
+*.swp
+*.swo
+*~
+*.tmp
+*.bak

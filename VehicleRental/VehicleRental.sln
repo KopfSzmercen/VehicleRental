@@ -6,7 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{6A463EC6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental.Tests.Integration", "Tests\VehicleRental.Tests.Integration\VehicleRental.Tests.Integration.csproj", "{4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental.Tests.Unit", "VehicleRental.Tests.Unit\VehicleRental.Tests.Unit.csproj", "{6A4B2E4F-5683-4006-BB18-5E87A1EB4B27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VehicleRental.Tests.Unit", "Tests\VehicleRental.Tests.Unit\VehicleRental.Tests.Unit.csproj", "{6A4B2E4F-5683-4006-BB18-5E87A1EB4B27}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
