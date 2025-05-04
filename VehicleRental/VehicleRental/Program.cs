@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using VehicleRental.Persistence;
+using VehicleRental.Rentals;
 using VehicleRental.Users;
 using VehicleRental.Vehicles;
 
@@ -11,9 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddPersistence(builder.Configuration);
+builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddUsersModule(builder.Configuration);
-builder.Services.AddVehiclesModule(builder.Configuration); // Add this line
+builder.Services.AddVehiclesModule(builder.Configuration);
+builder.Services.AddRentalsModule(builder.Configuration);
 
 var app = builder.Build();
 
@@ -26,7 +29,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseUsersModule();
-app.UseVehiclesModule(); // Add this line
+app.UseVehiclesModule();
+app.UseRentalsModule();
 
 await app.ApplyMigrations();
 

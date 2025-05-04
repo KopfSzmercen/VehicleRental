@@ -10,6 +10,7 @@ public static class VehiclesModule
     public static IServiceCollection AddVehiclesModule(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IVehicleRepository, VehiclesRepository>();
+        services.AddScoped<IVehiclesModuleApi, VehiclesModuleApi>();
 
         services.AddValidatorsFromAssemblyContaining<CreateVehicleEndpoint.RequestValidator>(ServiceLifetime.Singleton);
 
