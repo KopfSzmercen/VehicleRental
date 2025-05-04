@@ -17,6 +17,7 @@ bld/
 
 ## Visual Studio files
 .vs/
+obj/
 .vscode/
 *_i.c
 *_p.c
