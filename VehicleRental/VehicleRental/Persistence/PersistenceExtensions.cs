@@ -10,6 +10,8 @@ internal static class PersistenceExtensions
         {
             options.UseNpgsql(configuration.GetConnectionString("Database"));
         });
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
     public static async Task ApplyMigrations(this WebApplication app)
