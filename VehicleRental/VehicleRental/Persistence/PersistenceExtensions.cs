@@ -6,6 +6,7 @@ internal static class PersistenceExtensions
 {
     public static void AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         services.AddDbContext<AppDbContext>(options =>
         {
             options.UseNpgsql(configuration.GetConnectionString("Database"));

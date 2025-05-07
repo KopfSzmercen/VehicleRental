@@ -7,7 +7,7 @@ internal static class RentalsModuleInfrastructureExtensions
     public static IServiceCollection AddRentalsModuleInfrastructure(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddSingleton<IRentalsRepository, InMemoryRentalsRepository>();
+        services.AddScoped<IRentalsRepository, RentalsRepository>();
 
         return services;
     }

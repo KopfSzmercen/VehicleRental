@@ -11,9 +11,12 @@ public class TestWebApplication : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly TestMsSqlDatabase _database = new();
 
+    public HttpClient HttpClient { get; private set; } = null!;
+
     public async Task InitializeAsync()
     {
         await _database.InitializeAsync();
+        HttpClient = CreateClient();
     }
 
     public new async Task DisposeAsync()

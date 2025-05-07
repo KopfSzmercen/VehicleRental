@@ -44,7 +44,7 @@ internal sealed class CreateRentalEndpoint : IEndpoint
             request.StartDate,
             request.EndDate,
             new Money(100, Currency.USD), // This should be replaced with the actual wallet balance from the context
-            timeProvider.GetLocalNow()
+            timeProvider.GetUtcNow().ToUniversalTime()
         );
 
         await rentalsRepository.AddAsync(rental, cancellationToken);

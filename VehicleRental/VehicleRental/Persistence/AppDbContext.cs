@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using VehicleRental.Rentals.Domain;
+using VehicleRental.Rentals.Infrastructure;
 using VehicleRental.Users.Domain;
 using VehicleRental.Vehicles.Domain.VehicleFailures;
 using VehicleRental.Vehicles.Domain.Vehicles;
@@ -19,6 +21,8 @@ internal sealed class AppDbContext(DbContextOptions<AppDbContext> options) :
 
     public DbSet<VehicleFailure> VehicleFailures { get; set; } = null!;
 
+    public DbSet<Rental> Rentals { get; set; } = null!;
+
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,5 +31,6 @@ internal sealed class AppDbContext(DbContextOptions<AppDbContext> options) :
 
         VehicleConfiguration.Configure(modelBuilder);
         VehicleFailureConfiguration.Configure(modelBuilder);
+        RentalConfiguration.Configure(modelBuilder);
     }
 }

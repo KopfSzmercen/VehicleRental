@@ -34,7 +34,7 @@ internal sealed class FinishRentalEndpoint : IEndpoint
         if (rental is null || rental.CustomerId != Guid.Parse(userIdString))
             return TypedResults.NotFound($"Rental with ID {rentalId} does not exist.");
 
-        rental.Complete(timeProvider.GetLocalNow());
+        rental.Complete(timeProvider.GetUtcNow().ToUniversalTime());
 
         await rentalsRepository.UpdateAsync(rental, cancellationToken);
 

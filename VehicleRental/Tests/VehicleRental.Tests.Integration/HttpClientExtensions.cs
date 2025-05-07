@@ -21,14 +21,16 @@ internal static class HttpClientExtensions
 
         await userManager.AddToRoleAsync(user, UserRole.Admin);
 
+        var createdUser = await userManager.FindByEmailAsync("admin@admin.com");
+
         await userManager.AddClaimsAsync(user, [
-            new Claim("UserId", user.Id.ToString()),
+            new Claim("UserId", createdUser!.Id.ToString()),
             new Claim("SendEmails", true.ToString())
         ]);
 
         var tokensManager = scope.ServiceProvider.GetRequiredService<ITokensManager>();
 
-        var token = tokensManager.CreateToken(user.Id, [UserRole.Admin], []);
+        var token = tokensManager.CreateToken(createdUser.Id, [UserRole.Admin], []);
 
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
