@@ -2,7 +2,7 @@ using Testcontainers.PostgreSql;
 
 namespace VehicleRental.Tests.Integration;
 
-internal sealed class TestMsSqlDatabase : IAsyncLifetime
+internal sealed class TestPostgresDb : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder()
         .WithImage("postgres:latest")

@@ -12,6 +12,11 @@ internal static class PersistenceExtensions
             options.UseNpgsql(configuration.GetConnectionString("Database"));
         });
 
+        services.AddDbContext<AppReadDbContext>(options =>
+        {
+            options.UseNpgsql(configuration.GetConnectionString("Database"));
+        });
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 

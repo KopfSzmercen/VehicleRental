@@ -10,11 +10,11 @@ using VehicleRental.Vehicles.Domain.Vehicles;
 namespace VehicleRental.Tests.Integration.Rentals;
 
 [Collection(nameof(IntegrationTestsCollectionFixture))]
-public class FinishingRentalTests(TestWebApplication testWebApplication) : IAsyncDisposable
+public class FinishingRentalTests(TestWebApplication testWebApplication) : IDisposable
 {
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        await testWebApplication.ResetDatabaseAsync();
+        testWebApplication.ResetDatabaseAsync().Wait();
     }
 
     [Fact]

@@ -2,21 +2,17 @@ using System.Net;
 using System.Net.Http.Json;
 using Shouldly;
 using VehicleRental.Vehicles.Endpoints;
-// Assuming VehicleStatus enum is here
-
-// For HttpClientExtensions and TestWebApplication
 
 namespace VehicleRental.Tests.Integration.Vehicles;
 
 [Collection(nameof(IntegrationTestsCollectionFixture))]
-public class MakeVehicleAvailableTests(TestWebApplication testWebApplication) : IAsyncDisposable
+public class MakeVehicleAvailableTests(TestWebApplication testWebApplication) : IDisposable
 {
     private readonly TestWebApplication _testWebApplication = testWebApplication;
 
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        await _testWebApplication.ResetDatabaseAsync();
-        GC.SuppressFinalize(this);
+        _testWebApplication.ResetDatabaseAsync().Wait();
     }
 
     [Fact]

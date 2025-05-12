@@ -9,7 +9,7 @@ namespace VehicleRental.Tests.Integration;
 
 public class TestWebApplication : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly TestMsSqlDatabase _database = new();
+    private readonly TestPostgresDb _database = new();
 
     public HttpClient HttpClient { get; private set; } = null!;
 
@@ -32,7 +32,13 @@ public class TestWebApplication : WebApplicationFactory<Program>, IAsyncLifetime
 
         var respawner = await Respawner.CreateAsync(postgresConnection, new RespawnerOptions
         {
-            DbAdapter = DbAdapter.Postgres
+            DbAdapter = DbAdapter.Postgres,
+            TablesToIgnore =
+            [
+                "__EFMigrationsHistory",
+                "AspNetRoleClaims",
+                "AspNetRoles"
+            ]
         });
 
         await respawner.ResetAsync(postgresConnection);

@@ -6,7 +6,7 @@ using VehicleRental.Vehicles.Endpoints;
 namespace VehicleRental.Tests.Integration.Vehicles;
 
 [Collection(nameof(IntegrationTestsCollectionFixture))]
-public class CreateVehicleTests(TestWebApplication testWebApplication) : IDisposable
+public class BrowseVehiclesTests(TestWebApplication testWebApplication) : IDisposable
 {
     public void Dispose()
     {
@@ -14,7 +14,7 @@ public class CreateVehicleTests(TestWebApplication testWebApplication) : IDispos
     }
 
     [Fact]
-    public async Task GivenValidRequestAndAdminUser_CreateVehicle_ShouldSucceed()
+    public async Task GivenValidRequestAndAutorizedUser_BrowseVehicles_ShouldSucceed()
     {
         // Arrange
         var client = await testWebApplication
@@ -31,13 +31,12 @@ public class CreateVehicleTests(TestWebApplication testWebApplication) : IDispos
                 Longitude = -74.0060
             }
         };
+        await client.PostAsJsonAsync("/vehicles", createVehicleRequest);
 
         // Act
-        var response = await client.PostAsJsonAsync("/vehicles", createVehicleRequest);
+        var response = await client.GetAsync("/vehicles");
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
-        var vehicleId = await response.Content.ReadFromJsonAsync<Guid>();
-        vehicleId.ShouldNotBe(Guid.Empty);
     }
 }

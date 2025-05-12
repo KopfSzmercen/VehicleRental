@@ -7,13 +7,12 @@ using VehicleRental.Users.Endpoints;
 namespace VehicleRental.Tests.Integration.Users;
 
 [Collection(nameof(IntegrationTestsCollectionFixture))]
-public class GetMeTests(TestWebApplication testWebApplication) : IAsyncDisposable
+public class GetMeTests(TestWebApplication testWebApplication) : IDisposable
 {
-    public async ValueTask DisposeAsync()
+    public void Dispose()
     {
-        await testWebApplication.ResetDatabaseAsync();
+        testWebApplication.ResetDatabaseAsync().Wait();
     }
-
 
     [Fact]
     public async Task GivenUserIsSignedIn_GetMe_ShouldSucceed()
