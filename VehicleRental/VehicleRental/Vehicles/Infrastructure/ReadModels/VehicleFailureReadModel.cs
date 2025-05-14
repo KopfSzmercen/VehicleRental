@@ -1,11 +1,10 @@
+using VehicleRental.Common.Pagination;
 using VehicleRental.Vehicles.Domain.VehicleFailures;
 
 namespace VehicleRental.Vehicles.Infrastructure.ReadModels;
 
-internal sealed record VehicleFailureReadModel
+internal sealed record VehicleFailureReadModel : IEntityWithId
 {
-    public Guid Id { get; init; }
-
     public string Name { get; init; } = null!;
 
     public Guid VehicleId { get; init; }
@@ -19,4 +18,5 @@ internal sealed record VehicleFailureReadModel
     public VehicleFailureStatus Status { get; init; }
 
     public Guid CreatorId { get; private init; }
+    public Guid Id { get; init; }
 }

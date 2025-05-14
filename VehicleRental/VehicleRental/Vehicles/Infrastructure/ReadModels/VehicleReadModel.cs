@@ -1,12 +1,11 @@
+using VehicleRental.Common.Pagination;
 using VehicleRental.Vehicles.Domain;
 using VehicleRental.Vehicles.Domain.Vehicles;
 
 namespace VehicleRental.Vehicles.Infrastructure.ReadModels;
 
-internal sealed record VehicleReadModel
+internal sealed record VehicleReadModel : IEntityWithId
 {
-    public Guid Id { get; init; }
-
     public string Name { get; init; } = null!;
 
     public string RegistrationNumber { get; init; } = null!;
@@ -24,4 +23,5 @@ internal sealed record VehicleReadModel
     public IReadOnlyList<VehicleFailureReadModel> Failures { get; init; } = null!;
 
     public GeoLocalization? CurrentGeoLocalization { get; init; }
+    public Guid Id { get; init; }
 }

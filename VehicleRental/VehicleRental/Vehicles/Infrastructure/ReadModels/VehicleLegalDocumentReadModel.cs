@@ -1,9 +1,9 @@
+using VehicleRental.Common.Pagination;
+
 namespace VehicleRental.Vehicles.Infrastructure.ReadModels;
 
-internal sealed class VehicleLegalDocumentReadModel
+internal sealed class VehicleLegalDocumentReadModel : IEntityWithId
 {
-    public Guid Id { get; init; }
-
     public string Name { get; init; } = null!;
 
     public DateTimeOffset CreatedAt { get; init; }
@@ -15,4 +15,5 @@ internal sealed class VehicleLegalDocumentReadModel
     public Guid VehicleId { get; init; }
 
     public VehicleReadModel Vehicle { get; init; } = null!;
+    public Guid Id { get; init; }
 }
