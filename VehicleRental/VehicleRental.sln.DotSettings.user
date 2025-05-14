@@ -14,7 +14,7 @@
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9d353460_002D07cc_002D4fa8_002D9386_002Dbe6591cc374a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GivenValidRequestAndAutorizedUser_BrowseVehicles_ShouldSucceed" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C::net9.0::VehicleRental.Tests.Integration.Vehicles.BrowseVehiclesTests.GivenValidRequestAndAutorizedUser_BrowseVehicles_ShouldSucceed&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C::net9.0::VehicleRental.Tests.Integration.PaginationTests&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	
