@@ -12,7 +12,7 @@ internal class GetMeEndpoint : IEndpoint
     {
         app.MapGet("me", Handle)
             .RequireAuthorization()
-            .WithSummary("Sign in user and return JWT token");
+            .WithSummary("Gets the current user information");
     }
 
     private static async Task<Ok<Response>> Handle(

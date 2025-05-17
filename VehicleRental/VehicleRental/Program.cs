@@ -10,7 +10,18 @@ using VehicleRental.Vehicles;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi("v1", options => { options.AddDocumentTransformer<BearerSecuritySchemeTransformer>(); });
+builder.Services.AddOpenApi("v1", options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.CreateSchemaReferenceId = info =>
+    {
+        var declaringTypeName = info.Type.DeclaringType?.Name;
+
+        if (declaringTypeName is null) return null;
+
+        return string.IsNullOrEmpty(declaringTypeName) ? info.Type.Name : $"{declaringTypeName}.{info.Type.Name}";
+    };
+});
 
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddSingleton(TimeProvider.System);
