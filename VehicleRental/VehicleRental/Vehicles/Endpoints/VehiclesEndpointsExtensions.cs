@@ -17,6 +17,7 @@ internal static class VehiclesEndpointsExtensions
             .MapEndpoint<CreateVehicleEndpoint>()
             .MapEndpoint<AddVehicleLegalDocumentEndpoint>()
             .MapEndpoint<MakeVehicleAvailableEndpoint>()
-            .MapEndpoint<BrowseVehiclesEndpoint>();
+            .MapEndpoint<BrowseVehiclesEndpoint>()
+            .MapEndpoint<GetVehicleEndpoint>();
     }
 }

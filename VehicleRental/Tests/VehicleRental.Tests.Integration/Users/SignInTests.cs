@@ -6,11 +6,16 @@ using VehicleRental.Users.Endpoints;
 namespace VehicleRental.Tests.Integration.Users;
 
 [Collection(nameof(IntegrationTestsCollectionFixture))]
-public class SignInTests(TestWebApplication testWebApplication) : IAsyncDisposable
+public class SignInTests(TestWebApplication testWebApplication) : IDisposable, IAsyncDisposable
 {
     public async ValueTask DisposeAsync()
     {
-        await testWebApplication.ResetDatabaseAsync();
+        await testWebApplication.DisposeAsync();
+    }
+
+    public void Dispose()
+    {
+        testWebApplication.ResetDatabaseAsync().Wait();
     }
 
 

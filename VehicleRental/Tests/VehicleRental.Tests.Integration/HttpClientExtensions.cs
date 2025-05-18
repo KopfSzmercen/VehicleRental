@@ -36,4 +36,30 @@ internal static class HttpClientExtensions
 
         return client;
     }
+
+    public static async Task<HttpClient> SignInAsUserAsync(this HttpClient client,
+        TestWebApplication testWebApplication)
+    {
+        using var scope = testWebApplication.Services.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+        var user = User.CreateNormalUser("user@t.pl");
+
+        await userManager.CreateAsync(user, "userSecurePassword123");
+
+        await userManager.AddToRoleAsync(user, UserRole.User);
+
+        var createdUser = await userManager.FindByEmailAsync("user@t.pl");
+
+        await userManager.AddClaimsAsync(user, [
+            new Claim("UserId", createdUser!.Id.ToString()),
+            new Claim("SendEmails", true.ToString())
+        ]);
+
+        var tokensManager = scope.ServiceProvider.GetRequiredService<ITokensManager>();
+        var token = tokensManager.CreateToken(createdUser.Id, [UserRole.User], []);
+
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
+        return client;
+    }
 }

@@ -7,23 +7,24 @@ using VehicleRental.Persistence;
 
 namespace VehicleRental.Vehicles.Endpoints;
 
-internal sealed class BrowseVehiclesEndpoint : IEndpoint
+internal sealed class GetVehicleEndpoint : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapGet("", Handle)
-            .WithSummary("Browse all vehicles")
+        app.MapGet("{id:guid}", Handle)
+            .WithSummary("Get vehicle by id")
             .RequireAuthorization();
     }
 
-    private static async Task<Ok<IPaginatedEntity<BrowseVehiclesItemDto>>> Handle(
-        [AsParameters] PaginationQuery pagination,
+    private static async Task<Ok<VehicleDto>> Handle(
+        Guid id,
         [FromServices] AppReadDbContext dbContext
     )
     {
-        var vehicles = await dbContext.Vehicles
+        var vehicle = await dbContext.Vehicles
             .AsNoTracking()
-            .Select(x => new BrowseVehiclesItemDto
+            .Where(x => x.Id == id)
+            .Select(x => new VehicleDto
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -38,12 +39,9 @@ internal sealed class BrowseVehiclesEndpoint : IEndpoint
                     }
                     : null
             })
-            .PaginateAsync(
-                pagination.PageNumber,
-                pagination.PageSize
-            );
+            .FirstOrDefaultAsync();
 
-        return TypedResults.Ok(vehicles);
+        return TypedResults.Ok(vehicle);
     }
 
     public sealed record GeoLocalizationDto
@@ -53,7 +51,7 @@ internal sealed class BrowseVehiclesEndpoint : IEndpoint
         public double Longitude { get; init; }
     }
 
-    public sealed record BrowseVehiclesItemDto : IEntityWithId
+    public sealed record VehicleDto : IEntityWithId
     {
         public string Name { get; init; } = null!;
 

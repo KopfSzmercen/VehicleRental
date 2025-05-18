@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using VehicleRental.Rentals.Infrastructure.ReadModels;
 using VehicleRental.Vehicles.Infrastructure;
 using VehicleRental.Vehicles.Infrastructure.ReadModels;
 
@@ -12,6 +13,8 @@ internal sealed class AppReadDbContext(DbContextOptions<AppReadDbContext> option
     public DbSet<VehicleLegalDocumentReadModel> VehicleLegalDocuments { get; set; } = null!;
 
     public DbSet<VehicleFailureReadModel> VehicleFailures { get; set; } = null!;
+
+    public DbSet<RentalReadModel> Rentals { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -15,6 +15,7 @@ internal static class RentalsEndpointsExtensions
 
         group
             .MapEndpoint<CreateRentalEndpoint>()
-            .MapEndpoint<FinishRentalEndpoint>();
+            .MapEndpoint<FinishRentalEndpoint>()
+            .MapEndpoint<BrowseRentalsEndpoint>();
     }
 }
