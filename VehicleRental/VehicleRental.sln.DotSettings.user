@@ -26,6 +26,15 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9d353460_002D07cc_002D4fa8_002D9386_002Dbe6591cc374a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GivenValidRequestAndAutorizedUser_BrowseVehicles_ShouldSucceed" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/home/komp/PersonalProjects/VehicleRental/VehicleRental" Presentation="&amp;lt;Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cf63ee3d_002Dbd65_002D42eb_002Da6cf_002Dd1fcabd0e791/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Constructor_ShouldThrowException_WhenValueIsNegative" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationDurationInSecondsTests.Constructor_ShouldThrowException_WhenValueIsNegative&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationTests.CreateNew_ShouldThrowException_WhenStartDateIsInThePast&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationTests.CreateNew_ShouldCreateReservation_WhenValidParametersAreProvided&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationTests.Cancel_ShouldCancelReservation_WhenCalled&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationTests.Invalidate_ShouldInvalidateReservation_WhenCalled&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
 	
 	
 	</wpf:ResourceDictionary>
