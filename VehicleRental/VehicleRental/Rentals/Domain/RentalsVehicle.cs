@@ -17,6 +17,8 @@ internal sealed class RentalsVehicle
 
     public Rental? Rental { get; private set; }
 
+    public uint Version { get; set; }
+
     public static RentalsVehicle CreateNew(Guid id, DateTimeOffset now)
     {
         return new RentalsVehicle

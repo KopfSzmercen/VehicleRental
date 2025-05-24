@@ -25,6 +25,11 @@ internal static class RentalsVehicleConfiguration
             b.HasOne(x => x.Reservation)
                 .WithOne()
                 .HasForeignKey<Reservation>(r => r.CurrentVehicleId);
+
+            b.Property(x => x.Version)
+                .IsRowVersion()
+                .HasColumnName("xmin")
+                .HasColumnType("xid");
         });
 
         builder.Entity<Rental>(b =>

@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using VehicleRental.Common.ErrorHandling;
+
 namespace VehicleRental.Persistence;
 
 public interface IUnitOfWork
@@ -9,7 +12,15 @@ internal sealed class UnitOfWork(AppDbContext context) : IUnitOfWork
 {
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        await context.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new BusinessRuleValidationException(
+                "The data you are trying to update has been modified by another user. Please reload the data and try again.");
+        }
     }
 }
 
