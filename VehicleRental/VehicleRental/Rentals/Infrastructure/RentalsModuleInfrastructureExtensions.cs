@@ -4,11 +4,12 @@ namespace VehicleRental.Rentals.Infrastructure;
 
 internal static class RentalsModuleInfrastructureExtensions
 {
-    public static IServiceCollection AddRentalsModuleInfrastructure(this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddRentalsModuleInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
-        services.AddScoped<IRentalsRepository, RentalsRepository>();
-
+        services.AddScoped<IRentalsVehicleRepository, RentalsVehicleRepository>();
         return services;
     }
 

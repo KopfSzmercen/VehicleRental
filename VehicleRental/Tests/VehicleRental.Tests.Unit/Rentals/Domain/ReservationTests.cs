@@ -1,4 +1,3 @@
-using VehicleRental.Rentals.Domain;
 using VehicleRental.Rentals.Domain.Reservations;
 
 namespace VehicleTests.Tests.Unit.Rentals.Domain;
@@ -40,6 +39,7 @@ public class ReservationTests
         Assert.Equal(duration, reservation.Duration);
         Assert.Equal(userId, reservation.UserId);
         Assert.True(reservation.IsActive);
+        Assert.Equal(vehicleId, reservation.CurrentVehicleId);
     }
 
     [Fact]
@@ -59,6 +59,7 @@ public class ReservationTests
         // Assert
         Assert.False(reservation.IsActive);
         Assert.NotNull(reservation.CancelledAt);
+        Assert.Null(reservation.CurrentVehicleId);
     }
 
     [Fact]
@@ -77,5 +78,6 @@ public class ReservationTests
 
         // Assert
         Assert.False(reservation.IsActive);
+        Assert.Null(reservation.CurrentVehicleId);
     }
 }

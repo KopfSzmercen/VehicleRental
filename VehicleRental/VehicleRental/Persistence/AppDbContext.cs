@@ -20,8 +20,7 @@ internal sealed class AppDbContext(DbContextOptions<AppDbContext> options) :
     public DbSet<Vehicle> Vehicles { get; set; } = null!;
 
     public DbSet<VehicleFailure> VehicleFailures { get; set; } = null!;
-
-    public DbSet<Rental> Rentals { get; set; } = null!;
+    public DbSet<RentalsVehicle> RentalVehicles { get; set; } = null!;
 
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
@@ -31,6 +30,6 @@ internal sealed class AppDbContext(DbContextOptions<AppDbContext> options) :
 
         VehicleConfiguration.Configure(modelBuilder);
         VehicleFailureConfiguration.Configure(modelBuilder);
-        RentalConfiguration.Configure(modelBuilder);
+        RentalsVehicleConfiguration.Configure(modelBuilder);
     }
 }

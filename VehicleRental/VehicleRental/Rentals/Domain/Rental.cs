@@ -13,6 +13,8 @@ internal sealed class Rental
 
     public Guid Id { get; private init; }
 
+    public Guid? CurrentVehicleId { get; private set; }
+
     public Guid VehicleId { get; private init; }
 
     public Guid CustomerId { get; private init; }
@@ -59,7 +61,8 @@ internal sealed class Rental
             StartDate = startDate,
             EndDate = endDate,
             CreatedAt = now,
-            Status = RentalStatus.Active
+            Status = RentalStatus.Active,
+            CurrentVehicleId = vehicleId
         };
     }
 
@@ -71,6 +74,7 @@ internal sealed class Rental
         Status = RentalStatus.Completed;
 
         CompletedAt = now;
+        CurrentVehicleId = null;
     }
 
     public void Cancel(DateTimeOffset now)
@@ -81,5 +85,6 @@ internal sealed class Rental
         Status = RentalStatus.Cancelled;
 
         CancelledAt = now;
+        CurrentVehicleId = null;
     }
 }

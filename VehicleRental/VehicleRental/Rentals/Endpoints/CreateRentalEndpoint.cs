@@ -24,7 +24,7 @@ internal sealed class CreateRentalEndpoint : IEndpoint
         Created
     >> Handle(
         [FromBody] Request request,
-        [FromServices] IRentalsRepository rentalsRepository,
+        [FromServices] IRentalsVehicleRepository rentalsRepository,
         [FromServices] IVehiclesModuleApi vehiclesModuleApi,
         [FromServices] IHttpContextAccessor httpContextAccessor,
         [FromServices] IUnitOfWork unitOfWork,
@@ -38,16 +38,33 @@ internal sealed class CreateRentalEndpoint : IEndpoint
 
         var userId = httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value!;
 
+        var rentalVehicle = await rentalsRepository.GetByIdAsync(request.VehicleId, cancellationToken);
+
+        //TODO - this should be handled by a domain event when a vehicle is added
+        if (rentalVehicle is null)
+        {
+            var newVehicle = RentalsVehicle.CreateNew(
+                request.VehicleId,
+                timeProvider.GetUtcNow().ToUniversalTime()
+            );
+
+            await rentalsRepository.AddAsync(newVehicle, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+
+            rentalVehicle = newVehicle;
+        }
+
         var rental = Rental.CreateNew(
-            request.VehicleId,
+            rentalVehicle.Id,
             Guid.Parse(userId),
             request.StartDate,
             request.EndDate,
-            new Money(100, Currency.USD), // This should be replaced with the actual wallet balance from the context
+            new Money(100, Currency.USD),
             timeProvider.GetUtcNow().ToUniversalTime()
         );
 
-        await rentalsRepository.AddAsync(rental, cancellationToken);
+        rentalVehicle.Rent(rental, timeProvider.GetUtcNow().ToUniversalTime());
+        await rentalsRepository.UpdateAsync(rentalVehicle, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

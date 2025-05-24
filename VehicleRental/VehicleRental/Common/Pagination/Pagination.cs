@@ -55,9 +55,9 @@ public static class Pagination
         var totalCount = await query.CountAsync(cancellationToken);
 
         var items = await query
+            .OrderBy(x => x.Id)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
-            .OrderBy(x => x.Id)
             .ToListAsync(cancellationToken);
 
         return new PaginatedEntity<T>(items, totalCount, pageNumber, pageSize);

@@ -10,9 +10,11 @@ internal sealed class Reservation
 
     public Guid VehicleId { get; private init; }
 
+    public Guid? CurrentVehicleId { get; private set; }
+
     public DateTimeOffset CreatedAt { get; private init; }
 
-    public DateTimeOffset UpdatedAt { get; private set; }
+    public DateTimeOffset? UpdatedAt { get; private set; }
 
     public DateTimeOffset? CancelledAt { get; private set; }
 
@@ -44,7 +46,8 @@ internal sealed class Reservation
             StartDate = startDate,
             Duration = duration,
             UserId = userId,
-            IsActive = true
+            IsActive = true,
+            CurrentVehicleId = vehicleId
         };
     }
 
@@ -56,11 +59,13 @@ internal sealed class Reservation
         IsActive = false;
         CancelledAt = now;
         UpdatedAt = now;
+        CurrentVehicleId = null;
     }
 
     public void Invalidate(DateTimeOffset now)
     {
         IsActive = false;
         UpdatedAt = now;
+        CurrentVehicleId = null;
     }
 }

@@ -21,7 +21,7 @@ internal sealed class FinishRentalEndpoint : IEndpoint
         Ok<Guid>
     >> Handle(
         [FromRoute] Guid rentalId,
-        [FromServices] IRentalsRepository rentalsRepository,
+        [FromServices] IRentalsVehicleRepository rentalsVehicleRepository,
         [FromServices] IHttpContextAccessor httpContextAccessor,
         [FromServices] IUnitOfWork unitOfWork,
         [FromServices] TimeProvider timeProvider,
@@ -29,17 +29,17 @@ internal sealed class FinishRentalEndpoint : IEndpoint
     {
         var userIdString = httpContextAccessor.HttpContext?.User.FindFirst("UserId")!.Value!;
 
-        var rental = await rentalsRepository.GetByIdAsync(rentalId, cancellationToken);
+        var rentalVehicle = await rentalsVehicleRepository.GetByRentalIdAsync(rentalId, cancellationToken);
 
-        if (rental is null || rental.CustomerId != Guid.Parse(userIdString))
+        if (rentalVehicle?.Rental is null || rentalVehicle.Rental.CustomerId != Guid.Parse(userIdString))
             return TypedResults.NotFound($"Rental with ID {rentalId} does not exist.");
 
-        rental.Complete(timeProvider.GetUtcNow().ToUniversalTime());
+        rentalVehicle.CompleteRental(timeProvider.GetUtcNow().ToUniversalTime());
 
-        await rentalsRepository.UpdateAsync(rental, cancellationToken);
+        await rentalsVehicleRepository.UpdateAsync(rentalVehicle, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return TypedResults.Ok(rental.Id);
+        return TypedResults.Ok(rentalId);
     }
 }

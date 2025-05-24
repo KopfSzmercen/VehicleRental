@@ -1,3 +1,4 @@
+using Shouldly;
 using VehicleRental.Common.ErrorHandling;
 using VehicleRental.Rentals.Domain;
 
@@ -79,7 +80,7 @@ public class RentalTests
     }
 
     [Fact]
-    public void Complete_ShouldThorwException_WhenRentalIsAlreadyCompleted()
+    public void Complete_ShouldThrowException_WhenRentalIsAlreadyCompleted()
     {
         // Arrange
         var startDate = new DateTimeOffset(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
@@ -118,6 +119,8 @@ public class RentalTests
 
         // Assert
         Assert.NotNull(rental.CompletedAt);
+        rental.CurrentVehicleId.ShouldBeNull();
+        rental.Status.ShouldBe(RentalStatus.Completed);
     }
 
     [Fact]
@@ -140,5 +143,33 @@ public class RentalTests
 
         // Assert
         Assert.NotNull(rental.CancelledAt);
+        rental.Status.ShouldBe(RentalStatus.Cancelled);
+        rental.CurrentVehicleId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void CreateNew_ShouldSetStatusToActive_WhenCalled()
+    {
+        // Arrange
+        var startDate = new DateTimeOffset(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
+        var endDate = new DateTimeOffset(2023, 10, 2, 0, 0, 0, TimeSpan.Zero);
+        var now = new DateTimeOffset(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
+
+        var vehicleId = Guid.NewGuid();
+        var customerId = Guid.NewGuid();
+
+        var userWalletBalance = new Money(100, Currency.USD);
+
+        // Act
+        var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now);
+
+        // Assert
+        rental.Status.ShouldBe(RentalStatus.Active);
+        rental.VehicleId.ShouldBe(vehicleId);
+        rental.CustomerId.ShouldBe(customerId);
+        rental.StartDate.ShouldBe(startDate);
+        rental.EndDate.ShouldBe(endDate);
+        rental.CreatedAt.ShouldBe(now);
+        rental.CurrentVehicleId.ShouldBe(vehicleId);
     }
 }

@@ -16,7 +16,7 @@ public record ReservationDurationInSeconds
         };
     }
 
-    private int Value { get; }
+    public int Value { get; }
 
     public static implicit operator int(ReservationDurationInSeconds reservationDurationInSeconds)
     {

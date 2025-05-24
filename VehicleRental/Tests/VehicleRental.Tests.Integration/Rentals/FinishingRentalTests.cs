@@ -59,5 +59,15 @@ public class FinishingRentalTests(TestWebApplication testWebApplication) : IDisp
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        await using (var scope = testWebApplication.Services.CreateAsyncScope())
+        {
+            var scopedServices = scope.ServiceProvider;
+            var dbContext = scopedServices.GetRequiredService<AppDbContext>();
+
+            var rentalVehicle = await dbContext.RentalVehicles.FindAsync(vehicle.Id);
+            rentalVehicle.ShouldNotBeNull();
+            rentalVehicle.Rental.ShouldBeNull();
+        }
     }
 }

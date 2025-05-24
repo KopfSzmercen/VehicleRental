@@ -31,6 +31,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
             .SignInAsUserAsync(testWebApplication);
 
         Guid rentalId;
+        Guid userId;
         using (var scope = testWebApplication.Services.CreateScope())
         {
             var scopedServices = scope.ServiceProvider;
@@ -38,6 +39,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
             var userManager = scopedServices.GetRequiredService<UserManager<User>>();
 
             var user = await dbContext.Users.FirstAsync();
+            userId = user.Id;
 
             var vehicle = Vehicle.CreateNew(
                 "Test Car",
@@ -47,7 +49,15 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 DateTimeOffset.UtcNow
             );
 
-            dbContext.Vehicles.Add(vehicle);
+            var vehicle2 = Vehicle.CreateNew(
+                "Test Car 2",
+                "TEST5678",
+                GeoLocalization.Create(40.7128, -74.0060),
+                true,
+                DateTimeOffset.UtcNow
+            );
+
+            await dbContext.Vehicles.AddRangeAsync(vehicle, vehicle2);
 
             var rental = Rental.CreateNew(
                 vehicle.Id,
@@ -57,6 +67,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 new Money(600, Currency.EUR),
                 DateTimeOffset.Now
             );
+            rentalId = rental.Id;
 
             var otherUser = User.CreateNormalUser("otherUser@t.pl");
 
@@ -67,7 +78,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
             var createdOtherUser = await userManager.FindByEmailAsync("otherUser@t.pl");
 
             var rentalOfOtherUser = Rental.CreateNew(
-                vehicle.Id,
+                vehicle2.Id,
                 createdOtherUser!.Id,
                 DateTimeOffset.UtcNow.AddDays(1),
                 DateTimeOffset.UtcNow.AddDays(2),
@@ -75,9 +86,21 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 DateTimeOffset.Now
             );
 
-            rentalId = rental.Id;
+            var rentalVehicle = RentalsVehicle.CreateNew(
+                vehicle.Id,
+                DateTimeOffset.Now
+            );
 
-            dbContext.Rentals.AddRange(rental, rentalOfOtherUser);
+            rentalVehicle.Rent(rental, DateTimeOffset.Now);
+
+            var rentalVehicleOfOtherUser = RentalsVehicle.CreateNew(
+                vehicle2.Id,
+                DateTimeOffset.Now
+            );
+
+            rentalVehicleOfOtherUser.Rent(rentalOfOtherUser, DateTimeOffset.Now);
+
+            await dbContext.RentalVehicles.AddRangeAsync(rentalVehicle, rentalVehicleOfOtherUser);
 
             await dbContext.SaveChangesAsync();
         }
@@ -92,6 +115,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
 
         rentals.ShouldNotBeNull();
         rentals.Items.Count().ShouldBe(1);
+        rentals.Items.First().UserId.ShouldBe(userId);
         rentals.Items.First().Id.ShouldBe(rentalId);
     }
 
@@ -122,7 +146,20 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 DateTimeOffset.UtcNow
             );
 
-            dbContext.Vehicles.Add(vehicle);
+            var vehicle2 = Vehicle.CreateNew(
+                "Test Car 2",
+                "TEST5678",
+                GeoLocalization.Create(40.7128, -74.0060),
+                true,
+                DateTimeOffset.UtcNow
+            );
+
+            await dbContext.Vehicles.AddRangeAsync(vehicle, vehicle2);
+
+            var vehicleRental = RentalsVehicle.CreateNew(
+                vehicle.Id,
+                DateTimeOffset.Now
+            );
 
             var rental = Rental.CreateNew(
                 vehicle.Id,
@@ -133,7 +170,9 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 DateTimeOffset.Now
             );
 
-            dbContext.Rentals.Add(rental);
+            vehicleRental.Rent(rental, DateTimeOffset.Now);
+
+            dbContext.RentalVehicles.Add(vehicleRental);
 
             await dbContext.SaveChangesAsync();
         }
