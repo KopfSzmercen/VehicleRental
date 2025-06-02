@@ -34,19 +34,7 @@ public sealed class CreateReservationEndpoint : IEndpoint
 
         var rentalVehicle = await rentalsRepository.GetByIdAsync(request.VehicleId, cancellationToken);
 
-        //TODO - this should be handled by a domain event when a vehicle is added
-        if (rentalVehicle is null)
-        {
-            var newVehicle = RentalsVehicle.CreateNew(
-                request.VehicleId,
-                timeProvider.GetUtcNow().ToUniversalTime()
-            );
-
-            await rentalsRepository.AddAsync(newVehicle, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-
-            rentalVehicle = newVehicle;
-        }
+        if (rentalVehicle is null) return TypedResults.BadRequest("Vehicle not found.");
 
         var reservation = Reservation.CreateNew(
             rentalVehicle.Id,

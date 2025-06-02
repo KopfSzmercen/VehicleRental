@@ -3,9 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using VehicleRental.Persistence;
+using VehicleRental.Rentals.Domain;
 using VehicleRental.Rentals.Endpoints.Reservations;
-using VehicleRental.Vehicles.Domain;
-using VehicleRental.Vehicles.Domain.Vehicles;
 
 namespace VehicleRental.Tests.Integration.Reservations;
 
@@ -24,11 +23,8 @@ public class CreatingReservationTests(TestWebApplication testWebApplication) : I
             .CreateClient()
             .SignInAsAdminAsync(testWebApplication);
 
-        var vehicle = Vehicle.CreateNew(
-            "Test Car",
-            "TEST1234",
-            GeoLocalization.Create(40.7128, -74.0060),
-            true,
+        var vehicle = RentalsVehicle.CreateNew(
+            Guid.NewGuid(),
             DateTimeOffset.UtcNow
         );
 
@@ -37,7 +33,7 @@ public class CreatingReservationTests(TestWebApplication testWebApplication) : I
             var scopedServices = scope.ServiceProvider;
             var dbContext = scopedServices.GetRequiredService<AppDbContext>();
 
-            dbContext.Vehicles.Add(vehicle);
+            dbContext.RentalVehicles.Add(vehicle);
             await dbContext.SaveChangesAsync();
         }
 

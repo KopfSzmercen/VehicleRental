@@ -3,9 +3,8 @@ using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using VehicleRental.Persistence;
+using VehicleRental.Rentals.Domain;
 using VehicleRental.Rentals.Endpoints;
-using VehicleRental.Vehicles.Domain;
-using VehicleRental.Vehicles.Domain.Vehicles;
 
 namespace VehicleRental.Tests.Integration.Rentals;
 
@@ -25,11 +24,8 @@ public class CreatingRentalTests(TestWebApplication testWebApplication) : IDispo
             .CreateClient()
             .SignInAsAdminAsync(testWebApplication);
 
-        var vehicle = Vehicle.CreateNew(
-            "Test Car",
-            "TEST1234",
-            GeoLocalization.Create(40.7128, -74.0060),
-            true,
+        var vehicle = RentalsVehicle.CreateNew(
+            Guid.NewGuid(),
             DateTimeOffset.UtcNow
         );
 
@@ -38,7 +34,7 @@ public class CreatingRentalTests(TestWebApplication testWebApplication) : IDispo
             var scopedServices = scope.ServiceProvider;
             var dbContext = scopedServices.GetRequiredService<AppDbContext>();
 
-            dbContext.Vehicles.Add(vehicle);
+            dbContext.RentalVehicles.Add(vehicle);
             await dbContext.SaveChangesAsync();
         }
 

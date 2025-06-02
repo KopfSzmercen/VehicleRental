@@ -2,6 +2,8 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Common.Endpoints;
+using VehicleRental.Common.Messaging;
+using VehicleRental.IntegrationEvents;
 using VehicleRental.Persistence;
 using VehicleRental.Users.Domain;
 using VehicleRental.Vehicles.Domain;
@@ -23,6 +25,8 @@ internal class CreateVehicleEndpoint : IEndpoint
         [FromServices] IVehicleRepository vehicleRepository,
         [FromServices] IUnitOfWork unitOfWork,
         [FromBody] Request request,
+        [FromServices] IMessageBus messageBus,
+        [FromServices] TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
         var isUnique = await vehicleRepository.IsUniqueByRegistrationNumberAsync(
@@ -42,6 +46,17 @@ internal class CreateVehicleEndpoint : IEndpoint
 
         await vehicleRepository.AddAsync(vehicle, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        await messageBus.PublishAsync(
+            new VehicleCreatedIntegrationEvent
+            {
+                VehicleId = vehicle.Id,
+                VehicleCreatedAt = vehicle.CreatedAt,
+                Id = Guid.NewGuid(),
+                CreatedAt = timeProvider.GetUtcNow().ToUniversalTime()
+            },
+            cancellationToken
+        );
 
         return TypedResults.Ok(vehicle.Id);
     }

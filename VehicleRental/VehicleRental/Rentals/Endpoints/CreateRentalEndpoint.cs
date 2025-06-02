@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Common.Endpoints;
 using VehicleRental.Persistence;
 using VehicleRental.Rentals.Domain;
-using VehicleRental.Vehicles;
 
 namespace VehicleRental.Rentals.Endpoints;
 
@@ -25,34 +24,16 @@ internal sealed class CreateRentalEndpoint : IEndpoint
     >> Handle(
         [FromBody] Request request,
         [FromServices] IRentalsVehicleRepository rentalsRepository,
-        [FromServices] IVehiclesModuleApi vehiclesModuleApi,
         [FromServices] IHttpContextAccessor httpContextAccessor,
         [FromServices] IUnitOfWork unitOfWork,
         [FromServices] TimeProvider timeProvider,
         CancellationToken cancellationToken)
     {
-        var vehicleExists = await vehiclesModuleApi.ExistsByIdAsync(request.VehicleId, cancellationToken);
-
-        if (!vehicleExists)
-            return TypedResults.BadRequest($"Vehicle with ID {request.VehicleId} does not exist.");
-
         var userId = httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value!;
 
         var rentalVehicle = await rentalsRepository.GetByIdAsync(request.VehicleId, cancellationToken);
 
-        //TODO - this should be handled by a domain event when a vehicle is added
-        if (rentalVehicle is null)
-        {
-            var newVehicle = RentalsVehicle.CreateNew(
-                request.VehicleId,
-                timeProvider.GetUtcNow().ToUniversalTime()
-            );
-
-            await rentalsRepository.AddAsync(newVehicle, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-
-            rentalVehicle = newVehicle;
-        }
+        if (rentalVehicle is null) return TypedResults.BadRequest("Vehicle not found.");
 
         var rental = Rental.CreateNew(
             rentalVehicle.Id,
