@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using VehicleRental.Common;
+using VehicleRental.Common.Messaging;
 using VehicleRental.Persistence;
 using VehicleRental.Rentals;
 using VehicleRental.Users;
@@ -7,6 +8,7 @@ using VehicleRental.Vehicles;
 
 [assembly: InternalsVisibleTo("VehicleRental.Tests.Integration")]
 [assembly: InternalsVisibleTo("VehicleRental.Tests.Unit")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,7 @@ builder.Services.AddUsersModule(builder.Configuration);
 builder.Services.AddVehiclesModule(builder.Configuration);
 builder.Services.AddRentalsModule(builder.Configuration);
 
+builder.Services.AddMessaging();
 
 var app = builder.Build();
 

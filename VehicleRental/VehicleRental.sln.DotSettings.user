@@ -19,36 +19,15 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ARuntimeHelpers_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003Fc2766a3e812e42cdac93c1ca39bc3a54d19e00_003F09_003F3fffd319_003FRuntimeHelpers_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AUserManager_00601_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F97eefac9fbf54a7aaf346402b65b484c6a800_003F21_003Fa81c8974_003FUserManager_00601_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">/home/komp/.cache/JetBrains/Rider2025.1/resharper-host/temp/Rider/vAny/CoverageData/_VehicleRental.591431064/Snapshot/snapshot.utdcvr</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=131a759f_002Ddcbe_002D4d55_002Da86c_002Da6f485a7c32d/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GivenValidRequestAndAuthorizedUser_BrowseVehicles_ShouldSucceed" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::4EFB9A2A-26F1-46B5-B10B-7A990F8B2C2C::net9.0::VehicleRental.Tests.Integration.Vehicles.BrowseVehiclesTests.GivenValidRequestAndAuthorizedUser_BrowseVehicles_ShouldSucceed&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=33de8a85_002Dc65a_002D4210_002Dbc93_002D533846c66e35/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GivenValidRequestAndUserIsSignedIn_CreateReservation_ShouldSucceed" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Project Location="/home/komp/PersonalProjects/VehicleRental/VehicleRental/Tests/VehicleRental.Tests.Integration" Presentation="&amp;lt;Tests&amp;gt;\&amp;lt;VehicleRental.Tests.Integration&amp;gt;" /&gt;
-&lt;/SessionState&gt;</s:String>
 	
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=8ad0be40_002D0452_002D466b_002D9413_002D81a1dc7d6db9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from &amp;lt;Tests&amp;gt;\&amp;lt;VehicleRental.Tests.Integration&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Project Location="/home/komp/PersonalProjects/VehicleRental/VehicleRental/Tests/VehicleRental.Tests.Integration" Presentation="&amp;lt;Tests&amp;gt;\&amp;lt;VehicleRental.Tests.Integration&amp;gt;" /&gt;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=960d8fd3_002Db0ba_002D453d_002D9155_002Da9fb001de04c/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Solution /&gt;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=9d353460_002D07cc_002D4fa8_002D9386_002Dbe6591cc374a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GivenValidRequestAndAutorizedUser_BrowseVehicles_ShouldSucceed" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Project Location="/home/komp/PersonalProjects/VehicleRental/VehicleRental" Presentation="&amp;lt;Tests&amp;gt;" /&gt;
-&lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cf63ee3d_002Dbd65_002D42eb_002Da6cf_002Dd1fcabd0e791/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Constructor_ShouldThrowException_WhenValueIsNegative" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationDurationInSecondsTests.Constructor_ShouldThrowException_WhenValueIsNegative&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationTests.CreateNew_ShouldThrowException_WhenStartDateIsInThePast&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationTests.CreateNew_ShouldCreateReservation_WhenValidParametersAreProvided&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationTests.Cancel_ShouldCancelReservation_WhenCalled&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.ReservationTests.Invalidate_ShouldInvalidateReservation_WhenCalled&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.RentalsVehicleTests.Reserve_ShouldSetReservationAndUpdateTimestamp&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Rentals.Domain.RentalsVehicleTests&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
-&lt;/SessionState&gt;</s:String>
+	
+	
+	
+	
+	
+	
+	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f1f2469b_002De728_002D4221_002D9797_002D959c68c7bdc4/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;Project Location="/home/komp/PersonalProjects/VehicleRental/VehicleRental" Presentation="&amp;lt;Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
