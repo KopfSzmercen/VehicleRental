@@ -14,6 +14,7 @@ public static class ReservationsEndpointsExtensions
             .WithTags(GroupTag);
 
         group
-            .MapEndpoint<CreateReservationEndpoint>();
+            .MapEndpoint<CreateReservationEndpoint>()
+            .MapEndpoint<BrowseReservationsEndpoint>();
     }
 }

@@ -16,6 +16,8 @@ internal sealed class AppReadDbContext(DbContextOptions<AppReadDbContext> option
 
     public DbSet<RentalReadModel> Rentals { get; set; } = null!;
 
+    public DbSet<ReservationReadModel> Reservations { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

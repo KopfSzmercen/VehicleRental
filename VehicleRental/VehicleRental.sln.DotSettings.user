@@ -20,6 +20,18 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AUserManager_00601_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F97eefac9fbf54a7aaf346402b65b484c6a800_003F21_003Fa81c8974_003FUserManager_00601_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">/home/komp/.cache/JetBrains/Rider2025.1/resharper-host/temp/Rider/vAny/CoverageData/_VehicleRental.591431064/Snapshot/snapshot.utdcvr</s:String>
 	
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3b3428be_002Deabb_002D4d0a_002Dac03_002De38c14bd1a28/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="PublishAsync_ShouldPublishMessage_AndInvokeRegisteredHandlers" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::6A4B2E4F-5683-4006-BB18-5E87A1EB4B27::net9.0::VehicleTests.Tests.Unit.Common.InMemoryMessageBusTests.PublishAsync_ShouldPublishMessage_AndInvokeRegisteredHandlers&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d5cc3805_002D4a4b_002D415f_002D9620_002D9364537924c9/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Project Location="/home/komp/PersonalProjects/VehicleRental/VehicleRental" Presentation="&amp;lt;Tests&amp;gt;" /&gt;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=eff4ec07_002D0408_002D4e84_002Db42d_002D95b52f6c514a/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;Tests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Project Location="/home/komp/PersonalProjects/VehicleRental/VehicleRental" Presentation="&amp;lt;Tests&amp;gt;" /&gt;
+&lt;/SessionState&gt;</s:String>
+	
 	
 	
 	
