@@ -1,4 +1,5 @@
 using VehicleRental.Common.ErrorHandling;
+using VehicleRental.Rentals.Domain.Payments;
 
 namespace VehicleRental.Rentals.Domain;
 
@@ -32,6 +33,14 @@ internal sealed class Rental
     public RentalStatus Status { get; private set; }
 
     public Money Price { get; private init; } = null!;
+
+    public PaymentStatus? PaymentStatus { get; private set; }
+
+    public DateTimeOffset? PaidAt { get; private set; }
+
+    // Outstanding payment ("należność"): the price of a completed rental whose charge was declined.
+    public bool HasOutstandingPayment =>
+        Status == RentalStatus.Completed && PaymentStatus == Domain.PaymentStatus.Unpaid;
 
     public static Rental CreateNew(
         Guid vehicleId,
@@ -80,12 +89,22 @@ internal sealed class Rental
         return new Money((int)startedHours * PricePerStartedHourInUsd, Currency.USD);
     }
 
-    public void Complete(DateTimeOffset now)
+    public void Complete(DateTimeOffset now, ChargeResult chargeResult)
     {
         if (Status != RentalStatus.Active)
             throw new BusinessRuleValidationException("Rental is not active.");
 
         Status = RentalStatus.Completed;
+
+        if (chargeResult == ChargeResult.Succeeded)
+        {
+            PaymentStatus = Domain.PaymentStatus.Paid;
+            PaidAt = now;
+        }
+        else
+        {
+            PaymentStatus = Domain.PaymentStatus.Unpaid;
+        }
 
         CompletedAt = now;
         CurrentVehicleId = null;

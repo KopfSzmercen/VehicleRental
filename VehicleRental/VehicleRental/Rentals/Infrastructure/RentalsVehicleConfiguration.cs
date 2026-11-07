@@ -74,6 +74,11 @@ internal static class RentalsVehicleConfiguration
                     .IsRequired()
                     .HasConversion<string>();
             });
+
+            b.Property(r => r.PaymentStatus)
+                .HasConversion<string>();
+
+            b.Property(r => r.PaidAt);
         });
 
         builder.Entity<Reservation>(b =>

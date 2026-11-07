@@ -1,6 +1,7 @@
 using Shouldly;
 using VehicleRental.Common.ErrorHandling;
 using VehicleRental.Rentals.Domain;
+using VehicleRental.Rentals.Domain.Payments;
 using VehicleRental.Rentals.Domain.Reservations;
 
 namespace VehicleTests.Tests.Unit.Rentals.Domain;
@@ -685,6 +686,43 @@ public class RentalsVehicleTests
     }
 
     [Fact]
+    public void CompleteRental_WhenChargeSucceeded_ShouldCompleteRentalAsPaidAndFreeVehicle()
+    {
+        CompleteRental_ShouldPassChargeResultToRentalAndFreeVehicle(ChargeResult.Succeeded, PaymentStatus.Paid);
+    }
+
+    [Fact]
+    public void CompleteRental_WhenChargeDeclined_ShouldCompleteRentalAsUnpaidAndFreeVehicle()
+    {
+        CompleteRental_ShouldPassChargeResultToRentalAndFreeVehicle(ChargeResult.Declined, PaymentStatus.Unpaid);
+    }
+
+    private static void CompleteRental_ShouldPassChargeResultToRentalAndFreeVehicle(
+        ChargeResult chargeResult,
+        PaymentStatus expectedPaymentStatus)
+    {
+        // Arrange
+        var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), Now);
+        var rental = RentalFor(OwnerId, StartDate);
+        rentalsVehicle.Rent(rental, true, Now);
+        var finishedAt = StartDate.AddMinutes(20);
+
+        // Act
+        rentalsVehicle.CompleteRental(finishedAt, chargeResult);
+
+        // Assert
+        rentalsVehicle.Rental.ShouldBeNull();
+        rentalsVehicle.UpdatedAt.ShouldBe(finishedAt);
+        rental.Status.ShouldBe(RentalStatus.Completed);
+        rental.PaymentStatus.ShouldBe(expectedPaymentStatus);
+        rental.CurrentVehicleId.ShouldBeNull();
+
+        // The freed vehicle can be rented by another client.
+        rentalsVehicle.Rent(RentalFor(OtherClientId, finishedAt.AddMinutes(5)), true, finishedAt);
+        rentalsVehicle.Rental.ShouldNotBeNull();
+    }
+
+    [Fact]
     public void CompleteRental_ShouldSetRentalToNullAndUpdateTimestamp()
     {
         // Arrange
@@ -704,7 +742,7 @@ public class RentalsVehicleTests
         rentalsVehicle.Rent(rental, true, now);
 
         // Act
-        rentalsVehicle.CompleteRental(now);
+        rentalsVehicle.CompleteRental(now, ChargeResult.Succeeded);
 
         // Assert
         rentalsVehicle.Rental.ShouldBeNull();
@@ -720,6 +758,6 @@ public class RentalsVehicleTests
         var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), now);
 
         // Act & Assert
-        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.CompleteRental(now));
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.CompleteRental(now, ChargeResult.Succeeded));
     }
 }

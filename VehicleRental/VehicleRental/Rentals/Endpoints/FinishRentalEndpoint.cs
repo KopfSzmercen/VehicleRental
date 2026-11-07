@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Common.Endpoints;
 using VehicleRental.Persistence;
 using VehicleRental.Rentals.Domain;
+using VehicleRental.Rentals.Domain.Payments;
 
 namespace VehicleRental.Rentals.Endpoints;
 
@@ -22,6 +23,7 @@ internal sealed class FinishRentalEndpoint : IEndpoint
     >> Handle(
         [FromRoute] Guid rentalId,
         [FromServices] IRentalsVehicleRepository rentalsVehicleRepository,
+        [FromServices] IPaymentGateway paymentGateway,
         [FromServices] IHttpContextAccessor httpContextAccessor,
         [FromServices] IUnitOfWork unitOfWork,
         [FromServices] TimeProvider timeProvider,
@@ -29,13 +31,26 @@ internal sealed class FinishRentalEndpoint : IEndpoint
     {
         var userIdString = httpContextAccessor.HttpContext?.User.FindFirst("UserId")!.Value!;
 
+        // 4.6 Wczytaj wynajem
         var rentalVehicle = await rentalsVehicleRepository.GetByRentalIdAsync(rentalId, cancellationToken);
 
         if (rentalVehicle?.Rental is null || rentalVehicle.Rental.CustomerId != Guid.Parse(userIdString))
             return TypedResults.NotFound($"Rental with ID {rentalId} does not exist.");
 
-        rentalVehicle.CompleteRental(timeProvider.GetUtcNow().ToUniversalTime());
+        var rental = rentalVehicle.Rental;
 
+        // 4.9 Obciąż klienta: the only external call, made before the local transaction. The rental id is the
+        // idempotency key, so a retry after a failed save is recognised by the gateway and never charges twice.
+        var chargeResult = await paymentGateway.ChargeAsync(
+            rental.CustomerId,
+            rental.Price,
+            idempotencyKey: rental.Id,
+            cancellationToken);
+
+        // 4.7 Zakończ wynajem: Paid when the charge succeeded, Unpaid when it was declined.
+        rentalVehicle.CompleteRental(timeProvider.GetUtcNow().ToUniversalTime(), chargeResult);
+
+        // 4.8 Zapisz zakończenie
         await rentalsVehicleRepository.UpdateAsync(rentalVehicle, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

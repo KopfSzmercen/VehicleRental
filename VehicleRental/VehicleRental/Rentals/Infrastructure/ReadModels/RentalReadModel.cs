@@ -25,4 +25,8 @@ public sealed record RentalReadModel
     public int PriceAmount { get; init; }
 
     public string PriceCurrency { get; init; } = null!;
+
+    public PaymentStatus? PaymentStatus { get; init; }
+
+    public DateTimeOffset? PaidAt { get; init; }
 }

@@ -1,6 +1,7 @@
 using Shouldly;
 using VehicleRental.Common.ErrorHandling;
 using VehicleRental.Rentals.Domain;
+using VehicleRental.Rentals.Domain.Payments;
 
 namespace VehicleTests.Tests.Unit.Rentals.Domain;
 
@@ -141,34 +142,99 @@ public class RentalTests
         var userWalletBalance = new Money(1000, Currency.USD);
 
         var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now);
-        rental.Complete(now);
+        rental.Complete(now, ChargeResult.Succeeded);
 
         // Act & Assert
-        Assert.Throws<BusinessRuleValidationException>(() => rental.Complete(now));
+        Assert.Throws<BusinessRuleValidationException>(() => rental.Complete(now, ChargeResult.Succeeded));
     }
 
     [Fact]
-    public void Complete_ShouldSetCompletedAt_WhenCalled()
+    public void Complete_WhenChargeSucceeded_ShouldCompleteAsPaidAndDetachFromVehicle()
     {
         // Arrange
-        var startDate = new DateTimeOffset(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
-        var endDate = new DateTimeOffset(2023, 10, 2, 0, 0, 0, TimeSpan.Zero);
-        var now = new DateTimeOffset(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
-
-        var vehicleId = Guid.NewGuid();
-        var customerId = Guid.NewGuid();
-
-        var userWalletBalance = new Money(1000, Currency.USD);
-
-        var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now);
+        var rental = ActiveRental();
+        var finishedAt = CreatedAt.AddHours(3);
 
         // Act
-        rental.Complete(now);
+        rental.Complete(finishedAt, ChargeResult.Succeeded);
 
         // Assert
-        Assert.NotNull(rental.CompletedAt);
-        rental.CurrentVehicleId.ShouldBeNull();
         rental.Status.ShouldBe(RentalStatus.Completed);
+        rental.CompletedAt.ShouldBe(finishedAt);
+        rental.PaymentStatus.ShouldBe(PaymentStatus.Paid);
+        rental.PaidAt.ShouldBe(finishedAt);
+        rental.CurrentVehicleId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Complete_WhenChargeDeclined_ShouldCompleteAsUnpaidAndDetachFromVehicle()
+    {
+        // Arrange
+        var rental = ActiveRental();
+        var finishedAt = CreatedAt.AddHours(3);
+
+        // Act
+        rental.Complete(finishedAt, ChargeResult.Declined);
+
+        // Assert
+        rental.Status.ShouldBe(RentalStatus.Completed);
+        rental.CompletedAt.ShouldBe(finishedAt);
+        rental.PaymentStatus.ShouldBe(PaymentStatus.Unpaid);
+        rental.PaidAt.ShouldBeNull();
+        rental.CurrentVehicleId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void HasOutstandingPayment_ShouldBeTrue_WhenCompletedAndUnpaid()
+    {
+        var rental = ActiveRental();
+
+        rental.Complete(CreatedAt.AddHours(3), ChargeResult.Declined);
+
+        rental.HasOutstandingPayment.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void HasOutstandingPayment_ShouldBeFalse_WhenCompletedAndPaid()
+    {
+        var rental = ActiveRental();
+
+        rental.Complete(CreatedAt.AddHours(3), ChargeResult.Succeeded);
+
+        rental.HasOutstandingPayment.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void HasOutstandingPayment_ShouldBeFalse_WhenActive()
+    {
+        var rental = ActiveRental();
+
+        rental.HasOutstandingPayment.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void HasOutstandingPayment_ShouldBeFalse_WhenCancelled()
+    {
+        var rental = ActiveRental();
+
+        rental.Cancel(CreatedAt.AddMinutes(30));
+
+        rental.HasOutstandingPayment.ShouldBeFalse();
+        rental.PaymentStatus.ShouldBeNull();
+    }
+
+    private static readonly DateTimeOffset CreatedAt = new(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
+
+    private static Rental ActiveRental()
+    {
+        return Rental.CreateNew(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            CreatedAt.AddHours(1),
+            CreatedAt.AddHours(2),
+            new Money(1000, Currency.USD),
+            CreatedAt
+        );
     }
 
     [Fact]

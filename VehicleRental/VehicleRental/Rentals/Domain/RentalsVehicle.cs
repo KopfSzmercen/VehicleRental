@@ -1,4 +1,5 @@
 using VehicleRental.Common.ErrorHandling;
+using VehicleRental.Rentals.Domain.Payments;
 using VehicleRental.Rentals.Domain.Reservations;
 
 namespace VehicleRental.Rentals.Domain;
@@ -98,12 +99,12 @@ internal sealed class RentalsVehicle
         UpdatedAt = now;
     }
 
-    public void CompleteRental(DateTimeOffset now)
+    public void CompleteRental(DateTimeOffset now, ChargeResult chargeResult)
     {
         if (Rental is null)
             throw new BusinessRuleValidationException("Vehicle is not rented.");
 
-        Rental.Complete(now);
+        Rental.Complete(now, chargeResult);
         UpdatedAt = now;
         Rental = null;
     }

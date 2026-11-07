@@ -7,6 +7,7 @@ using Shouldly;
 using VehicleRental.Common.Pagination;
 using VehicleRental.Persistence;
 using VehicleRental.Rentals.Domain;
+using VehicleRental.Rentals.Domain.Payments;
 using VehicleRental.Rentals.Endpoints;
 using VehicleRental.Users.Domain;
 using VehicleRental.Vehicles.Domain;
@@ -193,5 +194,62 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
         rentals.Items.Count().ShouldBe(1);
         rentals.Items.First().PriceAmount.ShouldBe(30);
         rentals.Items.First().PriceCurrency.ShouldBe("USD");
+    }
+
+    [Fact]
+    public async Task BrowseRentals_ShouldReturnPaymentStatus_ToTheCustomerAndTheAdministrator()
+    {
+        // Arrange
+        var customer = await testWebApplication.CreateClient().SignInAsUserAsync(testWebApplication);
+        var admin = await testWebApplication.CreateClient().SignInAsAdminAsync(testWebApplication);
+
+        var paidRentalId = await CreateRentalAsync(customer, await testWebApplication.SeedAvailableVehicleAsync());
+        var unpaidRentalId = await CreateRentalAsync(customer, await testWebApplication.SeedAvailableVehicleAsync());
+        var activeRentalId = await CreateRentalAsync(customer, await testWebApplication.SeedAvailableVehicleAsync());
+
+        (await customer.PutAsJsonAsync($"/rentals/{paidRentalId}/finish", new object())).EnsureSuccessStatusCode();
+
+        testWebApplication.PaymentGateway.ChargeResult = ChargeResult.Declined;
+        (await customer.PutAsJsonAsync($"/rentals/{unpaidRentalId}/finish", new object())).EnsureSuccessStatusCode();
+
+        foreach (var client in new[] { customer, admin })
+        {
+            // Act
+            var response = await client.GetAsync("/rentals?PageNumber=1&PageSize=10");
+
+            // Assert
+            response.StatusCode.ShouldBe(HttpStatusCode.OK);
+            var rentals = (await response.Content
+                .ReadFromJsonAsync<PaginatedEntity<BrowseRentalsEndpoint.BrowseRentalItemResponse>>())!
+                .Items.ToDictionary(r => r.Id);
+
+            rentals[paidRentalId].PaymentStatus.ShouldBe(PaymentStatus.Paid);
+            rentals[paidRentalId].PaidAt.ShouldNotBeNull();
+
+            rentals[unpaidRentalId].PaymentStatus.ShouldBe(PaymentStatus.Unpaid);
+            rentals[unpaidRentalId].PaidAt.ShouldBeNull();
+
+            rentals[activeRentalId].PaymentStatus.ShouldBeNull();
+            rentals[activeRentalId].PaidAt.ShouldBeNull();
+        }
+
+        // The status travels as its name, not as a number.
+        var json = await customer.GetStringAsync("/rentals?PageNumber=1&PageSize=10");
+        json.ShouldContain("\"paymentStatus\":\"Unpaid\"");
+    }
+
+    private static async Task<Guid> CreateRentalAsync(HttpClient client, Guid vehicleId)
+    {
+        var startDate = DateTimeOffset.UtcNow.AddMinutes(3);
+
+        var response = await client.PostAsJsonAsync("/rentals", new CreateRentalEndpoint.Request
+        {
+            VehicleId = vehicleId,
+            StartDate = startDate,
+            EndDate = startDate.AddHours(1)
+        });
+        response.EnsureSuccessStatusCode();
+
+        return await response.Content.ReadFromJsonAsync<Guid>();
     }
 }
