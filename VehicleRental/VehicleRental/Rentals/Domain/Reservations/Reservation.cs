@@ -35,11 +35,15 @@ internal sealed class Reservation
         DateTimeOffset startDate,
         ReservationDurationInSeconds duration,
         DateTimeOffset now,
-        Guid userId
+        Guid userId,
+        bool customerHasUnpaidRentals
     )
     {
         if (startDate < now)
             throw new ArgumentException("Start date must be in the future.");
+
+        if (customerHasUnpaidRentals)
+            throw new BusinessRuleValidationException("Customer has unpaid rentals.");
 
         return new Reservation
         {

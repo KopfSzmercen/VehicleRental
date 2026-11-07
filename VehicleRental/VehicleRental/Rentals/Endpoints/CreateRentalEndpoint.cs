@@ -26,6 +26,7 @@ internal sealed class CreateRentalEndpoint : IEndpoint
     >> Handle(
         [FromBody] Request request,
         [FromServices] IRentalsVehicleRepository rentalsRepository,
+        [FromServices] ICompletedRentalsRepository completedRentalsRepository,
         [FromServices] IVehiclesModuleApi vehiclesModuleApi,
         [FromServices] IPaymentGateway paymentGateway,
         [FromServices] IHttpContextAccessor httpContextAccessor,
@@ -45,6 +46,9 @@ internal sealed class CreateRentalEndpoint : IEndpoint
 
         var customerId = Guid.Parse(userId);
 
+        var customerHasUnpaidRentals =
+            await completedRentalsRepository.HasUnpaidRentalsAsync(customerId, cancellationToken);
+
         // 4.3 Utwórz wynajem
         var walletBalance = await paymentGateway.GetBalanceAsync(customerId, cancellationToken);
 
@@ -54,6 +58,7 @@ internal sealed class CreateRentalEndpoint : IEndpoint
             request.StartDate,
             request.EndDate,
             walletBalance,
+            customerHasUnpaidRentals,
             timeProvider.GetUtcNow().ToUniversalTime()
         );
 

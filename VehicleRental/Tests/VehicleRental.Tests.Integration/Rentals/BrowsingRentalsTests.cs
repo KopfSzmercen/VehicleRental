@@ -67,6 +67,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 startDate,
                 startDate.AddHours(2),
                 new Money(1000, Currency.USD),
+                customerHasUnpaidRentals: false,
                 DateTimeOffset.Now
             );
             rentalId = rental.Id;
@@ -85,6 +86,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 DateTimeOffset.UtcNow.AddDays(1),
                 DateTimeOffset.UtcNow.AddDays(2),
                 new Money(1000, Currency.USD),
+                customerHasUnpaidRentals: false,
                 DateTimeOffset.Now
             );
 
@@ -172,6 +174,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 startDate,
                 startDate.AddHours(3),
                 new Money(1000, Currency.USD),
+                customerHasUnpaidRentals: false,
                 DateTimeOffset.Now
             );
 

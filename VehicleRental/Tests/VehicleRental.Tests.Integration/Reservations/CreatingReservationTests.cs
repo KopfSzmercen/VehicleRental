@@ -98,6 +98,32 @@ public class CreatingReservationTests(TestWebApplication testWebApplication) : I
         newReservation.CurrentVehicleId.ShouldBe(vehicleId);
     }
 
+    [Fact]
+    public async Task GivenCustomerHasUnpaidRental_CreateReservation_ShouldReturnBadRequestAndNotSaveReservation()
+    {
+        // Arrange
+        var client = await testWebApplication.CreateClient().SignInAsUserAsync(testWebApplication);
+        await testWebApplication.CreateUnpaidRentalAsync(client, await testWebApplication.SeedAvailableVehicleAsync());
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+
+        // Act
+        var response = await client.PostAsJsonAsync("/reservations", ValidRequestFor(vehicleId));
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await response.Content.ReadFromJsonAsync<string>()).ShouldBe("Customer has unpaid rentals.");
+
+        using var assertScope = testWebApplication.Services.CreateScope();
+        var dbContext = assertScope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        var rentalVehicle = await dbContext.RentalVehicles
+            .Where(rv => rv.Id == vehicleId)
+            .Include(x => x.Reservation)
+            .SingleAsync();
+
+        rentalVehicle.Reservation.ShouldBeNull();
+    }
+
     private static CreateReservationEndpoint.Request ValidRequestFor(Guid vehicleId)
     {
         return new CreateReservationEndpoint.Request

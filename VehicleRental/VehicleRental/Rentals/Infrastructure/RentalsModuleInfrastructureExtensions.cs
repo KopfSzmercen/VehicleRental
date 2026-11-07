@@ -12,6 +12,7 @@ internal static class RentalsModuleInfrastructureExtensions
     )
     {
         services.AddScoped<IRentalsVehicleRepository, RentalsVehicleRepository>();
+        services.AddScoped<ICompletedRentalsRepository, CompletedRentalsRepository>();
         services.AddSingleton<IPaymentGateway, FakePaymentGateway>();
         return services;
     }

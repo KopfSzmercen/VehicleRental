@@ -23,7 +23,7 @@ public class RentalTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() =>
-            Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now));
+            Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, customerHasUnpaidRentals: false, now));
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class RentalTests
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() =>
-            Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now));
+            Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, customerHasUnpaidRentals: false, now));
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class RentalTests
 
         // Act & Assert
         Assert.Throws<BusinessRuleValidationException>(() =>
-            Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now));
+            Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, customerHasUnpaidRentals: false, now));
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class RentalTests
 
         // Act
         var rental = Rental.CreateNew(
-            Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(240, Currency.USD), now);
+            Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(240, Currency.USD), customerHasUnpaidRentals: false, now);
 
         // Assert
         rental.Status.ShouldBe(RentalStatus.Active);
@@ -89,7 +89,7 @@ public class RentalTests
         // Act & Assert
         Should.Throw<BusinessRuleValidationException>(() =>
                 Rental.CreateNew(
-                    Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(239, Currency.USD), now))
+                    Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(239, Currency.USD), customerHasUnpaidRentals: false, now))
             .Message.ShouldBe("Insufficient wallet balance.");
     }
 
@@ -104,7 +104,55 @@ public class RentalTests
         // Act & Assert
         Should.Throw<BusinessRuleValidationException>(() =>
                 Rental.CreateNew(
-                    Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(0, Currency.USD), now))
+                    Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(0, Currency.USD), customerHasUnpaidRentals: false, now))
+            .Message.ShouldBe("Rental duration must be at least 60 seconds.");
+    }
+
+    [Fact]
+    public void CreateNew_ShouldThrowException_WhenCustomerHasUnpaidRentals()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
+        var startDate = now.AddMinutes(5);
+        var endDate = startDate.AddHours(1);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() =>
+                Rental.CreateNew(
+                    Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(1000, Currency.USD),
+                    customerHasUnpaidRentals: true, now))
+            .Message.ShouldBe("Customer has unpaid rentals.");
+    }
+
+    [Fact]
+    public void CreateNew_ShouldReportUnpaidRentals_BeforeInsufficientWalletBalance()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
+        var startDate = now.AddMinutes(5);
+        var endDate = startDate.AddHours(1);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() =>
+                Rental.CreateNew(
+                    Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(0, Currency.USD),
+                    customerHasUnpaidRentals: true, now))
+            .Message.ShouldBe("Customer has unpaid rentals.");
+    }
+
+    [Fact]
+    public void CreateNew_ShouldReportMinimumDuration_BeforeUnpaidRentals()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
+        var startDate = now.AddMinutes(5);
+        var endDate = startDate.AddSeconds(59);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() =>
+                Rental.CreateNew(
+                    Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(1000, Currency.USD),
+                    customerHasUnpaidRentals: true, now))
             .Message.ShouldBe("Rental duration must be at least 60 seconds.");
     }
 
@@ -122,7 +170,7 @@ public class RentalTests
 
         // Act
         var rental = Rental.CreateNew(
-            Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(1000, Currency.USD), now);
+            Guid.NewGuid(), Guid.NewGuid(), startDate, endDate, new Money(1000, Currency.USD), customerHasUnpaidRentals: false, now);
 
         // Assert
         rental.Price.ShouldBe(new Money(expectedPrice, Currency.USD));
@@ -141,7 +189,7 @@ public class RentalTests
 
         var userWalletBalance = new Money(1000, Currency.USD);
 
-        var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now);
+        var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, customerHasUnpaidRentals: false, now);
         rental.Complete(now, ChargeResult.Succeeded);
 
         // Act & Assert
@@ -223,6 +271,72 @@ public class RentalTests
         rental.PaymentStatus.ShouldBeNull();
     }
 
+    [Fact]
+    public void SettlePayment_WhenUnpaidAndChargeSucceeded_ShouldMarkRentalPaid()
+    {
+        // Arrange
+        var rental = ActiveRental();
+        rental.Complete(CreatedAt.AddHours(3), ChargeResult.Declined);
+        var settledAt = CreatedAt.AddDays(2);
+
+        // Act
+        rental.SettlePayment(ChargeResult.Succeeded, settledAt);
+
+        // Assert
+        rental.Status.ShouldBe(RentalStatus.Completed);
+        rental.PaymentStatus.ShouldBe(PaymentStatus.Paid);
+        rental.PaidAt.ShouldBe(settledAt);
+        rental.HasOutstandingPayment.ShouldBeFalse();
+    }
+
+    [Fact]
+    public void SettlePayment_WhenUnpaidAndChargeDeclined_ShouldThrowAndLeaveRentalUnpaid()
+    {
+        // Arrange
+        var rental = ActiveRental();
+        rental.Complete(CreatedAt.AddHours(3), ChargeResult.Declined);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() =>
+                rental.SettlePayment(ChargeResult.Declined, CreatedAt.AddDays(2)))
+            .Message.ShouldBe("Payment declined.");
+
+        rental.PaymentStatus.ShouldBe(PaymentStatus.Unpaid);
+        rental.PaidAt.ShouldBeNull();
+        rental.HasOutstandingPayment.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void SettlePayment_WhenAlreadyPaid_ShouldThrowNoOutstandingPayment()
+    {
+        // Arrange
+        var rental = ActiveRental();
+        var completedAt = CreatedAt.AddHours(3);
+        rental.Complete(completedAt, ChargeResult.Succeeded);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() =>
+                rental.SettlePayment(ChargeResult.Succeeded, CreatedAt.AddDays(2)))
+            .Message.ShouldBe("Rental has no outstanding payment.");
+
+        rental.PaidAt.ShouldBe(completedAt);
+    }
+
+    [Fact]
+    public void SettlePayment_WhenActive_ShouldThrowNoOutstandingPayment()
+    {
+        // Arrange
+        var rental = ActiveRental();
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() =>
+                rental.SettlePayment(ChargeResult.Succeeded, CreatedAt.AddDays(2)))
+            .Message.ShouldBe("Rental has no outstanding payment.");
+
+        rental.Status.ShouldBe(RentalStatus.Active);
+        rental.PaymentStatus.ShouldBeNull();
+    }
+
     private static readonly DateTimeOffset CreatedAt = new(2023, 10, 1, 0, 0, 0, TimeSpan.Zero);
 
     private static Rental ActiveRental()
@@ -233,6 +347,7 @@ public class RentalTests
             CreatedAt.AddHours(1),
             CreatedAt.AddHours(2),
             new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             CreatedAt
         );
     }
@@ -250,7 +365,7 @@ public class RentalTests
 
         var userWalletBalance = new Money(1000, Currency.USD);
 
-        var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now);
+        var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, customerHasUnpaidRentals: false, now);
 
         // Act
         rental.Cancel(now);
@@ -275,7 +390,7 @@ public class RentalTests
         var userWalletBalance = new Money(1000, Currency.USD);
 
         // Act
-        var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, now);
+        var rental = Rental.CreateNew(vehicleId, customerId, startDate, endDate, userWalletBalance, customerHasUnpaidRentals: false, now);
 
         // Assert
         rental.Status.ShouldBe(RentalStatus.Active);

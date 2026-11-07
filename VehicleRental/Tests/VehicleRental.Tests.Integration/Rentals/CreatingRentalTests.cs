@@ -199,6 +199,23 @@ public class CreatingRentalTests(TestWebApplication testWebApplication) : IDispo
     }
 
     [Fact]
+    public async Task GivenCustomerHasUnpaidRental_CreateRental_ShouldReturnBadRequestAndNotSaveRental()
+    {
+        // Arrange
+        var client = await testWebApplication.CreateClient().SignInAsUserAsync(testWebApplication);
+        await testWebApplication.CreateUnpaidRentalAsync(client, await testWebApplication.SeedAvailableVehicleAsync());
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+
+        // Act
+        var response = await client.PostAsJsonAsync("/rentals", ValidRequestFor(vehicleId));
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await response.Content.ReadFromJsonAsync<string>()).ShouldBe("Customer has unpaid rentals.");
+        (await LoadRentalsVehicleAsync(vehicleId)).Rental.ShouldBeNull();
+    }
+
+    [Fact]
     public async Task GivenPaymentGatewayIsUnavailable_CreateRental_ShouldReturnServiceUnavailableAndNotSaveRental()
     {
         // Arrange

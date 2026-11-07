@@ -48,6 +48,7 @@ internal sealed class Rental
         DateTimeOffset startDate,
         DateTimeOffset endDate,
         Money walletBalance,
+        bool customerHasUnpaidRentals,
         DateTimeOffset now
     )
     {
@@ -60,6 +61,9 @@ internal sealed class Rental
         if (endDate - startDate < TimeSpan.FromSeconds(MinimumRentalDurationInSeconds))
             throw new BusinessRuleValidationException(
                 $"Rental duration must be at least {MinimumRentalDurationInSeconds} seconds.");
+
+        if (customerHasUnpaidRentals)
+            throw new BusinessRuleValidationException("Customer has unpaid rentals.");
 
         var price = PriceFor(startDate, endDate);
 
@@ -108,6 +112,20 @@ internal sealed class Rental
 
         CompletedAt = now;
         CurrentVehicleId = null;
+    }
+
+    // Settles the outstanding payment with the result of a retried charge. A declined charge changes nothing,
+    // so the customer can retry.
+    public void SettlePayment(ChargeResult chargeResult, DateTimeOffset now)
+    {
+        if (!HasOutstandingPayment)
+            throw new BusinessRuleValidationException("Rental has no outstanding payment.");
+
+        if (chargeResult == ChargeResult.Declined)
+            throw new BusinessRuleValidationException("Payment declined.");
+
+        PaymentStatus = Domain.PaymentStatus.Paid;
+        PaidAt = now;
     }
 
     public void Cancel(DateTimeOffset now)

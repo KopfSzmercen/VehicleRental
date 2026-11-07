@@ -15,7 +15,27 @@ public class ReservationTests
     public void CreateNew_ShouldThrowException_WhenStartDateIsInThePast()
     {
         Should.Throw<ArgumentException>(() =>
-            Reservation.CreateNew(Guid.NewGuid(), StartDate, Duration, StartDate.AddDays(1), Guid.NewGuid()));
+            Reservation.CreateNew(
+                Guid.NewGuid(), StartDate, Duration, StartDate.AddDays(1), Guid.NewGuid(),
+                customerHasUnpaidRentals: false));
+    }
+
+    [Fact]
+    public void CreateNew_ShouldThrowException_WhenCustomerHasUnpaidRentals()
+    {
+        Should.Throw<BusinessRuleValidationException>(() =>
+                Reservation.CreateNew(
+                    Guid.NewGuid(), StartDate, Duration, Now, Guid.NewGuid(), customerHasUnpaidRentals: true))
+            .Message.ShouldBe("Customer has unpaid rentals.");
+    }
+
+    [Fact]
+    public void CreateNew_ShouldReportStartDateInThePast_BeforeUnpaidRentals()
+    {
+        Should.Throw<ArgumentException>(() =>
+            Reservation.CreateNew(
+                Guid.NewGuid(), StartDate, Duration, StartDate.AddDays(1), Guid.NewGuid(),
+                customerHasUnpaidRentals: true));
     }
 
     [Fact]
@@ -26,7 +46,8 @@ public class ReservationTests
         var userId = Guid.NewGuid();
 
         // Act
-        var reservation = Reservation.CreateNew(vehicleId, StartDate, Duration, Now, userId);
+        var reservation = Reservation.CreateNew(
+            vehicleId, StartDate, Duration, Now, userId, customerHasUnpaidRentals: false);
 
         // Assert
         reservation.VehicleId.ShouldBe(vehicleId);
@@ -115,6 +136,7 @@ public class ReservationTests
 
     private static Reservation CreateReservation()
     {
-        return Reservation.CreateNew(Guid.NewGuid(), StartDate, Duration, Now, Guid.NewGuid());
+        return Reservation.CreateNew(
+            Guid.NewGuid(), StartDate, Duration, Now, Guid.NewGuid(), customerHasUnpaidRentals: false);
     }
 }
