@@ -81,4 +81,33 @@ public class MoneyTests
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => money1 - money2);
     }
+
+    [Theory]
+    [InlineData(100, 50, true)]
+    [InlineData(100, 100, true)]
+    [InlineData(99, 100, false)]
+    public void OperatorGreaterThanOrEqual_ShouldCompareAmounts_WhenSameCurrency(int left, int right, bool expected)
+    {
+        // Arrange
+        var money1 = new Money(left, Currency.USD);
+        var money2 = new Money(right, Currency.USD);
+
+        // Act & Assert
+        Assert.Equal(expected, money1 >= money2);
+        Assert.Equal(!expected, money1 < money2);
+    }
+
+    [Fact]
+    public void Comparison_ShouldThrowException_WhenDifferentCurrencies()
+    {
+        // Arrange
+        var money1 = new Money(100, Currency.USD);
+        var money2 = new Money(50, Currency.EUR);
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => money1 >= money2);
+        Assert.Throws<InvalidOperationException>(() => money1 < money2);
+        Assert.Throws<InvalidOperationException>(() => money1 > money2);
+        Assert.Throws<InvalidOperationException>(() => money1 <= money2);
+    }
 }

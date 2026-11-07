@@ -26,7 +26,7 @@ public class RentalsVehicleTests
             customerId,
             startDate,
             endDate ?? startDate.AddMinutes(30),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             Now
         );
     }
@@ -169,7 +169,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 
@@ -223,7 +223,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 
@@ -375,7 +375,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 
@@ -400,7 +400,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 
@@ -423,7 +423,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 
@@ -455,7 +455,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 
@@ -479,7 +479,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 
@@ -510,7 +510,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 
@@ -697,7 +697,7 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
             now
         );
 

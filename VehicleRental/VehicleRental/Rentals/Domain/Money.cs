@@ -30,6 +30,34 @@ internal sealed record Money
         return new Money(left.Amount - right.Amount, left.Currency);
     }
 
+    public static bool operator >=(Money left, Money right)
+    {
+        return CompareAmounts(left, right) >= 0;
+    }
+
+    public static bool operator <=(Money left, Money right)
+    {
+        return CompareAmounts(left, right) <= 0;
+    }
+
+    public static bool operator >(Money left, Money right)
+    {
+        return CompareAmounts(left, right) > 0;
+    }
+
+    public static bool operator <(Money left, Money right)
+    {
+        return CompareAmounts(left, right) < 0;
+    }
+
+    private static int CompareAmounts(Money left, Money right)
+    {
+        if (left.Currency != right.Currency)
+            throw new InvalidOperationException("Cannot compare money with different currencies.");
+
+        return left.Amount.CompareTo(right.Amount);
+    }
+
     public static List<string> GetSupportedCurrencies()
     {
         return Enum.GetNames<Currency>().ToList();

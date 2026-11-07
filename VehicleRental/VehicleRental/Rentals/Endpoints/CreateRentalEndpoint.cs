@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Common.Endpoints;
 using VehicleRental.Persistence;
 using VehicleRental.Rentals.Domain;
+using VehicleRental.Rentals.Domain.Payments;
 using VehicleRental.Vehicles;
 
 namespace VehicleRental.Rentals.Endpoints;
@@ -26,6 +27,7 @@ internal sealed class CreateRentalEndpoint : IEndpoint
         [FromBody] Request request,
         [FromServices] IRentalsVehicleRepository rentalsRepository,
         [FromServices] IVehiclesModuleApi vehiclesModuleApi,
+        [FromServices] IPaymentGateway paymentGateway,
         [FromServices] IHttpContextAccessor httpContextAccessor,
         [FromServices] IUnitOfWork unitOfWork,
         [FromServices] TimeProvider timeProvider,
@@ -41,13 +43,17 @@ internal sealed class CreateRentalEndpoint : IEndpoint
         var vehicleIsAvailable =
             await vehiclesModuleApi.IsAvailableForRentalAsync(rentalVehicle.Id, cancellationToken);
 
+        var customerId = Guid.Parse(userId);
+
         // 4.3 Utwórz wynajem
+        var walletBalance = await paymentGateway.GetBalanceAsync(customerId, cancellationToken);
+
         var rental = Rental.CreateNew(
             rentalVehicle.Id,
-            Guid.Parse(userId),
+            customerId,
             request.StartDate,
             request.EndDate,
-            new Money(100, Currency.USD),
+            walletBalance,
             timeProvider.GetUtcNow().ToUniversalTime()
         );
 

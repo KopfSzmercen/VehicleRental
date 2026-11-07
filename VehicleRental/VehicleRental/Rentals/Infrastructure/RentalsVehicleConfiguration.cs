@@ -62,6 +62,18 @@ internal static class RentalsVehicleConfiguration
             b.Property(r => r.Status)
                 .IsRequired()
                 .HasConversion<string>();
+
+            b.ComplexProperty(r => r.Price, price =>
+            {
+                price.Property(p => p.Amount)
+                    .HasColumnName("PriceAmount")
+                    .IsRequired();
+
+                price.Property(p => p.Currency)
+                    .HasColumnName("PriceCurrency")
+                    .IsRequired()
+                    .HasConversion<string>();
+            });
         });
 
         builder.Entity<Reservation>(b =>

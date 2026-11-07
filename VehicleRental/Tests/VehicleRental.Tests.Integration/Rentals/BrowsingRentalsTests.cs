@@ -59,12 +59,13 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
 
             await dbContext.Vehicles.AddRangeAsync(vehicle, vehicle2);
 
+            var startDate = DateTimeOffset.UtcNow.AddDays(1);
             var rental = Rental.CreateNew(
                 vehicle.Id,
                 user.Id,
-                DateTimeOffset.UtcNow.AddDays(1),
-                DateTimeOffset.UtcNow.AddDays(2),
-                new Money(600, Currency.EUR),
+                startDate,
+                startDate.AddHours(2),
+                new Money(1000, Currency.USD),
                 DateTimeOffset.Now
             );
             rentalId = rental.Id;
@@ -82,7 +83,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 createdOtherUser!.Id,
                 DateTimeOffset.UtcNow.AddDays(1),
                 DateTimeOffset.UtcNow.AddDays(2),
-                new Money(600, Currency.EUR),
+                new Money(1000, Currency.USD),
                 DateTimeOffset.Now
             );
 
@@ -117,6 +118,8 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
         rentals.Items.Count().ShouldBe(1);
         rentals.Items.First().UserId.ShouldBe(userId);
         rentals.Items.First().Id.ShouldBe(rentalId);
+        rentals.Items.First().PriceAmount.ShouldBe(20);
+        rentals.Items.First().PriceCurrency.ShouldBe("USD");
     }
 
     [Fact]
@@ -161,12 +164,13 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 DateTimeOffset.Now
             );
 
+            var startDate = DateTimeOffset.UtcNow.AddDays(1);
             var rental = Rental.CreateNew(
                 vehicle.Id,
                 createdOtherUser!.Id,
-                DateTimeOffset.UtcNow.AddDays(1),
-                DateTimeOffset.UtcNow.AddDays(2),
-                new Money(600, Currency.EUR),
+                startDate,
+                startDate.AddHours(3),
+                new Money(1000, Currency.USD),
                 DateTimeOffset.Now
             );
 
@@ -187,5 +191,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
 
         rentals.ShouldNotBeNull();
         rentals.Items.Count().ShouldBe(1);
+        rentals.Items.First().PriceAmount.ShouldBe(30);
+        rentals.Items.First().PriceCurrency.ShouldBe("USD");
     }
 }

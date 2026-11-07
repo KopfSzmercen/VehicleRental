@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Respawn;
+using VehicleRental.Rentals.Domain.Payments;
 
 namespace VehicleRental.Tests.Integration;
 
@@ -12,6 +16,8 @@ public class TestWebApplication : WebApplicationFactory<Program>, IAsyncLifetime
     private readonly TestPostgresDb _database = new();
 
     public HttpClient HttpClient { get; private set; } = null!;
+
+    internal StubPaymentGateway PaymentGateway { get; } = new();
 
     public async Task InitializeAsync()
     {
@@ -42,6 +48,8 @@ public class TestWebApplication : WebApplicationFactory<Program>, IAsyncLifetime
         });
 
         await respawner.ResetAsync(postgresConnection);
+
+        PaymentGateway.Reset();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -50,6 +58,12 @@ public class TestWebApplication : WebApplicationFactory<Program>, IAsyncLifetime
             "ConnectionStrings:Database",
             _database.ConnectionString
         );
+
+        builder.ConfigureTestServices(services =>
+        {
+            services.RemoveAll<IPaymentGateway>();
+            services.AddSingleton<IPaymentGateway>(PaymentGateway);
+        });
     }
 
     protected override IHost CreateHost(IHostBuilder builder)

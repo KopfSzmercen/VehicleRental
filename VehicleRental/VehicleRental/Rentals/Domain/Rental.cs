@@ -5,7 +5,7 @@ namespace VehicleRental.Rentals.Domain;
 internal sealed class Rental
 {
     private const int MinimumRentalDurationInSeconds = 60;
-    private const int MinimumWalletBalance = 10;
+    private const int PricePerStartedHourInUsd = 10;
 
     private Rental()
     {
@@ -31,12 +31,14 @@ internal sealed class Rental
 
     public RentalStatus Status { get; private set; }
 
+    public Money Price { get; private init; } = null!;
+
     public static Rental CreateNew(
         Guid vehicleId,
         Guid customerId,
         DateTimeOffset startDate,
         DateTimeOffset endDate,
-        Money userWalletBalance,
+        Money walletBalance,
         DateTimeOffset now
     )
     {
@@ -50,8 +52,10 @@ internal sealed class Rental
             throw new BusinessRuleValidationException(
                 $"Rental duration must be at least {MinimumRentalDurationInSeconds} seconds.");
 
-        if (userWalletBalance.Amount < MinimumWalletBalance)
-            throw new BusinessRuleValidationException($"User wallet balance must be at least {MinimumWalletBalance}.");
+        var price = PriceFor(startDate, endDate);
+
+        if (walletBalance < price)
+            throw new BusinessRuleValidationException("Insufficient wallet balance.");
 
         return new Rental
         {
@@ -62,8 +66,18 @@ internal sealed class Rental
             EndDate = endDate,
             CreatedAt = now,
             Status = RentalStatus.Active,
-            CurrentVehicleId = vehicleId
+            CurrentVehicleId = vehicleId,
+            Price = price
         };
+    }
+
+    // 10 USD per started hour of the booked duration [startDate, endDate).
+    private static Money PriceFor(DateTimeOffset startDate, DateTimeOffset endDate)
+    {
+        var durationInTicks = (endDate - startDate).Ticks;
+        var startedHours = (durationInTicks + TimeSpan.TicksPerHour - 1) / TimeSpan.TicksPerHour;
+
+        return new Money((int)startedHours * PricePerStartedHourInUsd, Currency.USD);
     }
 
     public void Complete(DateTimeOffset now)

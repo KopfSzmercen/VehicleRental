@@ -62,7 +62,9 @@ public sealed class BrowseRentalsEndpoint : IEndpoint
                 EndDate = r.EndDate,
                 CancelledAt = r.CancelledAt,
                 CreatedAt = r.CreatedAt,
-                CompletedAt = r.CompletedAt
+                CompletedAt = r.CompletedAt,
+                PriceAmount = r.PriceAmount,
+                PriceCurrency = r.PriceCurrency
             })
             .PaginateAsync(paginationQuery.PageNumber, paginationQuery.PageSize);
 
@@ -91,7 +93,9 @@ public sealed class BrowseRentalsEndpoint : IEndpoint
                 EndDate = r.EndDate,
                 CancelledAt = r.CancelledAt,
                 CreatedAt = r.CreatedAt,
-                CompletedAt = r.CompletedAt
+                CompletedAt = r.CompletedAt,
+                PriceAmount = r.PriceAmount,
+                PriceCurrency = r.PriceCurrency
             })
             .PaginateAsync(paginationQuery.PageNumber, paginationQuery.PageSize);
 
@@ -110,6 +114,10 @@ public sealed class BrowseRentalsEndpoint : IEndpoint
         public DateTimeOffset? CompletedAt { get; init; }
 
         public DateTimeOffset? CancelledAt { get; init; }
+
+        public int PriceAmount { get; init; }
+
+        public string PriceCurrency { get; init; } = null!;
 
         public Guid Id { get; init; }
     }
