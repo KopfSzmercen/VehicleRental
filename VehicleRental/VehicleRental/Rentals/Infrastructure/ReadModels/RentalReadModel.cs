@@ -21,4 +21,12 @@ public sealed record RentalReadModel
     public DateTimeOffset? CancelledAt { get; init; }
 
     public RentalStatus Status { get; init; }
+
+    public int PriceAmount { get; init; }
+
+    public string PriceCurrency { get; init; } = null!;
+
+    public PaymentStatus? PaymentStatus { get; init; }
+
+    public DateTimeOffset? PaidAt { get; init; }
 }

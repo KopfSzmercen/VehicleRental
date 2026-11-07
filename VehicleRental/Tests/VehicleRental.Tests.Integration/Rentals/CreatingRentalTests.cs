@@ -151,6 +151,87 @@ public class CreatingRentalTests(TestWebApplication testWebApplication) : IDispo
         (await LoadRentalsVehicleAsync(vehicleId)).Rental.ShouldBeNull();
     }
 
+    [Fact]
+    public async Task GivenValidRequest_CreateRental_ShouldStoreRentalPricedPerStartedHour()
+    {
+        // Arrange
+        var client = await testWebApplication.CreateClient().SignInAsUserAsync(testWebApplication);
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+        var startDate = DateTimeOffset.UtcNow.AddMinutes(3);
+
+        // Act
+        var response = await client.PostAsJsonAsync("/rentals", new CreateRentalEndpoint.Request
+        {
+            VehicleId = vehicleId,
+            StartDate = startDate,
+            EndDate = startDate.AddMinutes(90)
+        });
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var rental = (await LoadRentalsVehicleAsync(vehicleId)).Rental;
+        rental.ShouldNotBeNull();
+        rental.Price.ShouldBe(new Money(20, Currency.USD));
+    }
+
+    [Fact]
+    public async Task GivenWalletBalanceLowerThanPrice_CreateRental_ShouldReturnBadRequestAndNotSaveRental()
+    {
+        // Arrange
+        var client = await testWebApplication.CreateClient().SignInAsUserAsync(testWebApplication);
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+        var startDate = DateTimeOffset.UtcNow.AddMinutes(3);
+        testWebApplication.PaymentGateway.Balance = new Money(19, Currency.USD);
+
+        // Act
+        var response = await client.PostAsJsonAsync("/rentals", new CreateRentalEndpoint.Request
+        {
+            VehicleId = vehicleId,
+            StartDate = startDate,
+            EndDate = startDate.AddMinutes(90)
+        });
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await response.Content.ReadFromJsonAsync<string>()).ShouldBe("Insufficient wallet balance.");
+        (await LoadRentalsVehicleAsync(vehicleId)).Rental.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GivenCustomerHasUnpaidRental_CreateRental_ShouldReturnBadRequestAndNotSaveRental()
+    {
+        // Arrange
+        var client = await testWebApplication.CreateClient().SignInAsUserAsync(testWebApplication);
+        await testWebApplication.CreateUnpaidRentalAsync(client, await testWebApplication.SeedAvailableVehicleAsync());
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+
+        // Act
+        var response = await client.PostAsJsonAsync("/rentals", ValidRequestFor(vehicleId));
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await response.Content.ReadFromJsonAsync<string>()).ShouldBe("Customer has unpaid rentals.");
+        (await LoadRentalsVehicleAsync(vehicleId)).Rental.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task GivenPaymentGatewayIsUnavailable_CreateRental_ShouldReturnServiceUnavailableAndNotSaveRental()
+    {
+        // Arrange
+        var client = await testWebApplication.CreateClient().SignInAsUserAsync(testWebApplication);
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+        testWebApplication.PaymentGateway.IsUnavailable = true;
+
+        // Act
+        var response = await client.PostAsJsonAsync("/rentals", ValidRequestFor(vehicleId));
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.ServiceUnavailable);
+        (await response.Content.ReadFromJsonAsync<string>()).ShouldBe("Payment gateway is unavailable.");
+        (await LoadRentalsVehicleAsync(vehicleId)).Rental.ShouldBeNull();
+    }
+
     private static async Task<Guid> ReserveAsync(HttpClient client, Guid vehicleId, DateTimeOffset startDate)
     {
         var response = await client.PostAsJsonAsync("/reservations", new CreateReservationEndpoint.Request

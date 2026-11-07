@@ -45,7 +45,8 @@ public class RentalsVehicleConcurrencyTests(TestWebApplication testWebApplicatio
                 Guid.NewGuid(),
                 DateTimeOffset.UtcNow.AddDays(1),
                 DateTimeOffset.UtcNow.AddDays(2),
-                new Money(600, Currency.EUR),
+                new Money(1000, Currency.USD),
+                customerHasUnpaidRentals: false,
                 DateTimeOffset.Now
             );
 

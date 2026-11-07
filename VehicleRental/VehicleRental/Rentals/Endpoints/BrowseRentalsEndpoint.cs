@@ -1,9 +1,11 @@
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Common.Endpoints;
 using VehicleRental.Common.Pagination;
 using VehicleRental.Persistence;
+using VehicleRental.Rentals.Domain;
 using VehicleRental.Users.Domain;
 
 namespace VehicleRental.Rentals.Endpoints;
@@ -62,7 +64,11 @@ public sealed class BrowseRentalsEndpoint : IEndpoint
                 EndDate = r.EndDate,
                 CancelledAt = r.CancelledAt,
                 CreatedAt = r.CreatedAt,
-                CompletedAt = r.CompletedAt
+                CompletedAt = r.CompletedAt,
+                PriceAmount = r.PriceAmount,
+                PriceCurrency = r.PriceCurrency,
+                PaymentStatus = r.PaymentStatus,
+                PaidAt = r.PaidAt
             })
             .PaginateAsync(paginationQuery.PageNumber, paginationQuery.PageSize);
 
@@ -91,7 +97,11 @@ public sealed class BrowseRentalsEndpoint : IEndpoint
                 EndDate = r.EndDate,
                 CancelledAt = r.CancelledAt,
                 CreatedAt = r.CreatedAt,
-                CompletedAt = r.CompletedAt
+                CompletedAt = r.CompletedAt,
+                PriceAmount = r.PriceAmount,
+                PriceCurrency = r.PriceCurrency,
+                PaymentStatus = r.PaymentStatus,
+                PaidAt = r.PaidAt
             })
             .PaginateAsync(paginationQuery.PageNumber, paginationQuery.PageSize);
 
@@ -110,6 +120,15 @@ public sealed class BrowseRentalsEndpoint : IEndpoint
         public DateTimeOffset? CompletedAt { get; init; }
 
         public DateTimeOffset? CancelledAt { get; init; }
+
+        public int PriceAmount { get; init; }
+
+        public string PriceCurrency { get; init; } = null!;
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public PaymentStatus? PaymentStatus { get; init; }
+
+        public DateTimeOffset? PaidAt { get; init; }
 
         public Guid Id { get; init; }
     }

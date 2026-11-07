@@ -5,6 +5,7 @@ internal static class ErrorHandlingExtensions
     public static IServiceCollection AddErrorHandling(this IServiceCollection services)
     {
         services.AddExceptionHandler<BusinessRuleValidationExceptionHandler>();
+        services.AddExceptionHandler<PaymentGatewayUnavailableExceptionHandler>();
         services.AddProblemDetails();
 
         return services;

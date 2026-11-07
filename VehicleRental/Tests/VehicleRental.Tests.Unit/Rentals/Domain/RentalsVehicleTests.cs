@@ -1,6 +1,7 @@
 using Shouldly;
 using VehicleRental.Common.ErrorHandling;
 using VehicleRental.Rentals.Domain;
+using VehicleRental.Rentals.Domain.Payments;
 using VehicleRental.Rentals.Domain.Reservations;
 
 namespace VehicleTests.Tests.Unit.Rentals.Domain;
@@ -16,7 +17,8 @@ public class RentalsVehicleTests
 
     private static Reservation ReservationFor(Guid userId)
     {
-        return Reservation.CreateNew(Guid.NewGuid(), StartDate, new ReservationDurationInSeconds(3600), Now, userId);
+        return Reservation.CreateNew(Guid.NewGuid(), StartDate, new ReservationDurationInSeconds(3600), Now, userId,
+            customerHasUnpaidRentals: false);
     }
 
     private static Rental RentalFor(Guid customerId, DateTimeOffset startDate, DateTimeOffset? endDate = null)
@@ -26,7 +28,8 @@ public class RentalsVehicleTests
             customerId,
             startDate,
             endDate ?? startDate.AddMinutes(30),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             Now
         );
     }
@@ -58,7 +61,8 @@ public class RentalsVehicleTests
             now.AddHours(1),
             new ReservationDurationInSeconds(3600),
             now,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            customerHasUnpaidRentals: false
         );
 
 
@@ -83,7 +87,8 @@ public class RentalsVehicleTests
             now.AddHours(1),
             new ReservationDurationInSeconds(3600),
             now,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            customerHasUnpaidRentals: false
         );
 
         // Act & Assert
@@ -105,7 +110,8 @@ public class RentalsVehicleTests
             now.AddHours(1),
             new ReservationDurationInSeconds(3600),
             now,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            customerHasUnpaidRentals: false
         );
 
         rentalsVehicle.Reserve(reservation, true, now);
@@ -124,7 +130,8 @@ public class RentalsVehicleTests
 
         var later = WindowEnd;
         var newReservation = Reservation.CreateNew(
-            rentalsVehicle.Id, later.AddHours(1), new ReservationDurationInSeconds(3600), later, OtherClientId);
+            rentalsVehicle.Id, later.AddHours(1), new ReservationDurationInSeconds(3600), later, OtherClientId,
+            customerHasUnpaidRentals: false);
 
         // Act
         rentalsVehicle.Reserve(newReservation, true, later);
@@ -146,7 +153,7 @@ public class RentalsVehicleTests
         var justBeforeWindowEnd = WindowEnd.AddTicks(-1);
         var newReservation = Reservation.CreateNew(
             rentalsVehicle.Id, WindowEnd.AddHours(1), new ReservationDurationInSeconds(3600),
-            justBeforeWindowEnd, OtherClientId);
+            justBeforeWindowEnd, OtherClientId, customerHasUnpaidRentals: false);
 
         // Act & Assert
         Should.Throw<BusinessRuleValidationException>(() =>
@@ -169,7 +176,8 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
@@ -178,7 +186,8 @@ public class RentalsVehicleTests
             now.AddHours(1),
             new ReservationDurationInSeconds(3600),
             now,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            customerHasUnpaidRentals: false
         );
 
         rentalsVehicle.Rent(rental, true, now);
@@ -200,7 +209,8 @@ public class RentalsVehicleTests
             now.AddHours(1),
             new ReservationDurationInSeconds(3600),
             now,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            customerHasUnpaidRentals: false
         );
 
         rentalsVehicle.Reserve(reservation, true, now);
@@ -223,7 +233,8 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
@@ -232,7 +243,8 @@ public class RentalsVehicleTests
             now.AddHours(1),
             new ReservationDurationInSeconds(3600),
             now,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            customerHasUnpaidRentals: false
         );
 
         rentalsVehicle.Rent(rental, true, now);
@@ -375,7 +387,8 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
@@ -400,7 +413,8 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
@@ -423,7 +437,8 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
@@ -447,7 +462,8 @@ public class RentalsVehicleTests
             now.AddHours(1),
             new ReservationDurationInSeconds(3600),
             now,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            customerHasUnpaidRentals: false
         );
 
         var rental = Rental.CreateNew(
@@ -455,7 +471,8 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
@@ -479,7 +496,8 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
@@ -502,7 +520,8 @@ public class RentalsVehicleTests
             now.AddHours(1),
             new ReservationDurationInSeconds(3600),
             now,
-            Guid.NewGuid()
+            Guid.NewGuid(),
+            customerHasUnpaidRentals: false
         );
 
         var rental = Rental.CreateNew(
@@ -510,7 +529,8 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
@@ -685,6 +705,43 @@ public class RentalsVehicleTests
     }
 
     [Fact]
+    public void CompleteRental_WhenChargeSucceeded_ShouldCompleteRentalAsPaidAndFreeVehicle()
+    {
+        CompleteRental_ShouldPassChargeResultToRentalAndFreeVehicle(ChargeResult.Succeeded, PaymentStatus.Paid);
+    }
+
+    [Fact]
+    public void CompleteRental_WhenChargeDeclined_ShouldCompleteRentalAsUnpaidAndFreeVehicle()
+    {
+        CompleteRental_ShouldPassChargeResultToRentalAndFreeVehicle(ChargeResult.Declined, PaymentStatus.Unpaid);
+    }
+
+    private static void CompleteRental_ShouldPassChargeResultToRentalAndFreeVehicle(
+        ChargeResult chargeResult,
+        PaymentStatus expectedPaymentStatus)
+    {
+        // Arrange
+        var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), Now);
+        var rental = RentalFor(OwnerId, StartDate);
+        rentalsVehicle.Rent(rental, true, Now);
+        var finishedAt = StartDate.AddMinutes(20);
+
+        // Act
+        rentalsVehicle.CompleteRental(finishedAt, chargeResult);
+
+        // Assert
+        rentalsVehicle.Rental.ShouldBeNull();
+        rentalsVehicle.UpdatedAt.ShouldBe(finishedAt);
+        rental.Status.ShouldBe(RentalStatus.Completed);
+        rental.PaymentStatus.ShouldBe(expectedPaymentStatus);
+        rental.CurrentVehicleId.ShouldBeNull();
+
+        // The freed vehicle can be rented by another client.
+        rentalsVehicle.Rent(RentalFor(OtherClientId, finishedAt.AddMinutes(5)), true, finishedAt);
+        rentalsVehicle.Rental.ShouldNotBeNull();
+    }
+
+    [Fact]
     public void CompleteRental_ShouldSetRentalToNullAndUpdateTimestamp()
     {
         // Arrange
@@ -697,14 +754,15 @@ public class RentalsVehicleTests
             Guid.NewGuid(),
             now.AddHours(1),
             now.AddHours(2),
-            new Money(100, Currency.AUD),
+            new Money(1000, Currency.USD),
+            customerHasUnpaidRentals: false,
             now
         );
 
         rentalsVehicle.Rent(rental, true, now);
 
         // Act
-        rentalsVehicle.CompleteRental(now);
+        rentalsVehicle.CompleteRental(now, ChargeResult.Succeeded);
 
         // Assert
         rentalsVehicle.Rental.ShouldBeNull();
@@ -720,6 +778,6 @@ public class RentalsVehicleTests
         var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), now);
 
         // Act & Assert
-        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.CompleteRental(now));
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.CompleteRental(now, ChargeResult.Succeeded));
     }
 }

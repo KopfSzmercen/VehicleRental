@@ -58,7 +58,8 @@ public class BrowsingReservationsTests(TestWebApplication testWebApplication) : 
                 DateTimeOffset.UtcNow.AddDays(1),
                 new ReservationDurationInSeconds(3600),
                 DateTimeOffset.UtcNow,
-                currentUserId
+                currentUserId,
+                customerHasUnpaidRentals: false
             );
             currentUserReservationVehicleId = vehicle1.Id;
 
@@ -68,7 +69,8 @@ public class BrowsingReservationsTests(TestWebApplication testWebApplication) : 
                 DateTimeOffset.UtcNow.AddDays(1),
                 new ReservationDurationInSeconds(3600),
                 DateTimeOffset.UtcNow,
-                createdOtherUser!.Id
+                createdOtherUser!.Id,
+                customerHasUnpaidRentals: false
             );
 
             vehicle1.Reserve(currentUserReservation, true, DateTimeOffset.UtcNow);
@@ -126,7 +128,8 @@ public class BrowsingReservationsTests(TestWebApplication testWebApplication) : 
                 DateTimeOffset.UtcNow.AddDays(1),
                 new ReservationDurationInSeconds(3600),
                 DateTimeOffset.UtcNow,
-                userId
+                userId,
+                customerHasUnpaidRentals: false
             );
 
             someUserReservationVehicleId = userReservation.VehicleId;

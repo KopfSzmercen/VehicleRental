@@ -1,4 +1,6 @@
 using VehicleRental.Rentals.Domain;
+using VehicleRental.Rentals.Domain.Payments;
+using VehicleRental.Rentals.Infrastructure.Payments;
 
 namespace VehicleRental.Rentals.Infrastructure;
 
@@ -10,6 +12,8 @@ internal static class RentalsModuleInfrastructureExtensions
     )
     {
         services.AddScoped<IRentalsVehicleRepository, RentalsVehicleRepository>();
+        services.AddScoped<ICompletedRentalsRepository, CompletedRentalsRepository>();
+        services.AddSingleton<IPaymentGateway, FakePaymentGateway>();
         return services;
     }
 
