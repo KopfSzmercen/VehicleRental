@@ -1,3 +1,5 @@
+using VehicleRental.Common.ErrorHandling;
+
 namespace VehicleRental.Rentals.Domain.Reservations;
 
 internal sealed class Reservation
@@ -22,9 +24,11 @@ internal sealed class Reservation
 
     public ReservationDurationInSeconds Duration { get; private init; } = null!;
 
-    public bool IsActive { get; private set; }
+    public ReservationStatus Status { get; private set; }
 
     public Guid UserId { get; private init; }
+
+    public DateTimeOffset EndDate => StartDate.AddSeconds(Duration.Value);
 
     public static Reservation CreateNew(
         Guid vehicleId,
@@ -46,25 +50,49 @@ internal sealed class Reservation
             StartDate = startDate,
             Duration = duration,
             UserId = userId,
-            IsActive = true,
+            Status = ReservationStatus.Active,
             CurrentVehicleId = vehicleId
         };
     }
 
-    public void Cancel(DateTimeOffset now)
+    public bool IsExpired(DateTimeOffset now)
     {
-        if (!IsActive)
-            throw new InvalidOperationException("Reservation is not active.");
-
-        IsActive = false;
-        CancelledAt = now;
-        UpdatedAt = now;
-        CurrentVehicleId = null;
+        return HasWindowEnded(StartDate, Duration, now);
     }
 
-    public void Invalidate(DateTimeOffset now)
+    // Shared with the read side, which shows a stored Active reservation past its window as Expired.
+    public static bool HasWindowEnded(DateTimeOffset startDate, int durationInSeconds, DateTimeOffset now)
     {
-        IsActive = false;
+        return now >= startDate.AddSeconds(durationInSeconds);
+    }
+
+    public bool IsWithinWindow(DateTimeOffset date)
+    {
+        return date >= StartDate && date < EndDate;
+    }
+
+    public void Cancel(DateTimeOffset now)
+    {
+        End(ReservationStatus.Cancelled, now);
+        CancelledAt = now;
+    }
+
+    public void Expire(DateTimeOffset now)
+    {
+        End(ReservationStatus.Expired, now);
+    }
+
+    public void Fulfil(DateTimeOffset now)
+    {
+        End(ReservationStatus.Fulfilled, now);
+    }
+
+    private void End(ReservationStatus endStatus, DateTimeOffset now)
+    {
+        if (Status != ReservationStatus.Active)
+            throw new BusinessRuleValidationException("Reservation is not active.");
+
+        Status = endStatus;
         UpdatedAt = now;
         CurrentVehicleId = null;
     }

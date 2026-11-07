@@ -1,3 +1,5 @@
+using VehicleRental.Rentals.Domain.Reservations;
+
 namespace VehicleRental.Rentals.Infrastructure.ReadModels;
 
 public sealed record ReservationReadModel
@@ -21,5 +23,5 @@ public sealed record ReservationReadModel
 
     public int Duration { get; init; }
 
-    public bool IsActive { get; init; }
+    public ReservationStatus Status { get; init; }
 }

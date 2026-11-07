@@ -1,83 +1,120 @@
+using Shouldly;
+using VehicleRental.Common.ErrorHandling;
 using VehicleRental.Rentals.Domain.Reservations;
 
 namespace VehicleTests.Tests.Unit.Rentals.Domain;
 
 public class ReservationTests
 {
+    private static readonly DateTimeOffset Now = new(2023, 1, 1, 0, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset StartDate = new(2023, 1, 2, 0, 0, 0, TimeSpan.Zero);
+    private static readonly ReservationDurationInSeconds Duration = new(3600);
+    private static readonly DateTimeOffset WindowEnd = StartDate.AddHours(1);
+
     [Fact]
     public void CreateNew_ShouldThrowException_WhenStartDateIsInThePast()
     {
-        // Arrange
-        var vehicleId = Guid.NewGuid();
-        var startDate = new DateTimeOffset(2023, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        var duration = new ReservationDurationInSeconds(3600);
-        var now = new DateTimeOffset(2023, 1, 2, 0, 0, 0, TimeSpan.Zero);
-        var userId = Guid.NewGuid();
-
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() =>
-            Reservation.CreateNew(vehicleId, startDate, duration, now, userId));
+        Should.Throw<ArgumentException>(() =>
+            Reservation.CreateNew(Guid.NewGuid(), StartDate, Duration, StartDate.AddDays(1), Guid.NewGuid()));
     }
 
     [Fact]
-    public void CreateNew_ShouldCreateReservation_WhenValidParametersAreProvided()
+    public void CreateNew_ShouldCreateActiveReservation_WhenValidParametersAreProvided()
     {
         // Arrange
         var vehicleId = Guid.NewGuid();
-        var startDate = new DateTimeOffset(2023, 1, 2, 0, 0, 0, TimeSpan.Zero);
-        var duration = new ReservationDurationInSeconds(3600);
-        var now = new DateTimeOffset(2023, 1, 1, 0, 0, 0, TimeSpan.Zero);
         var userId = Guid.NewGuid();
 
         // Act
-        var reservation = Reservation.CreateNew(vehicleId, startDate, duration, now, userId);
+        var reservation = Reservation.CreateNew(vehicleId, StartDate, Duration, Now, userId);
 
         // Assert
-        Assert.NotNull(reservation);
-        Assert.Equal(vehicleId, reservation.VehicleId);
-        Assert.Equal(startDate, reservation.StartDate);
-        Assert.Equal(duration, reservation.Duration);
-        Assert.Equal(userId, reservation.UserId);
-        Assert.True(reservation.IsActive);
-        Assert.Equal(vehicleId, reservation.CurrentVehicleId);
+        reservation.VehicleId.ShouldBe(vehicleId);
+        reservation.StartDate.ShouldBe(StartDate);
+        reservation.Duration.ShouldBe(Duration);
+        reservation.UserId.ShouldBe(userId);
+        reservation.Status.ShouldBe(ReservationStatus.Active);
+        reservation.CurrentVehicleId.ShouldBe(vehicleId);
     }
 
     [Fact]
-    public void Cancel_ShouldCancelReservation_WhenCalled()
+    public void IsExpired_JustBeforeWindowEnd_ShouldBeFalse()
     {
-        // Arrange
-        var vehicleId = Guid.NewGuid();
-        var startDate = new DateTimeOffset(2023, 1, 2, 0, 0, 0, TimeSpan.Zero);
-        var duration = new ReservationDurationInSeconds(3600);
-        var now = new DateTimeOffset(2023, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        var userId = Guid.NewGuid();
-        var reservation = Reservation.CreateNew(vehicleId, startDate, duration, now, userId);
+        var reservation = CreateReservation();
 
-        // Act
-        reservation.Cancel(now);
-
-        // Assert
-        Assert.False(reservation.IsActive);
-        Assert.NotNull(reservation.CancelledAt);
-        Assert.Null(reservation.CurrentVehicleId);
+        reservation.IsExpired(WindowEnd.AddTicks(-1)).ShouldBeFalse();
     }
 
     [Fact]
-    public void Invalidate_ShouldInvalidateReservation_WhenCalled()
+    public void IsExpired_AtWindowEnd_ShouldBeTrue()
+    {
+        var reservation = CreateReservation();
+
+        reservation.IsExpired(WindowEnd).ShouldBeTrue();
+    }
+
+    [Fact]
+    public void Cancel_ShouldMarkReservationCancelledAndDetachIt()
     {
         // Arrange
-        var vehicleId = Guid.NewGuid();
-        var startDate = new DateTimeOffset(2023, 1, 2, 0, 0, 0, TimeSpan.Zero);
-        var duration = new ReservationDurationInSeconds(3600);
-        var now = new DateTimeOffset(2023, 1, 1, 0, 0, 0, TimeSpan.Zero);
-        var userId = Guid.NewGuid();
-        var reservation = Reservation.CreateNew(vehicleId, startDate, duration, now, userId);
+        var reservation = CreateReservation();
+        var cancelledAt = Now.AddMinutes(5);
 
         // Act
-        reservation.Invalidate(now);
+        reservation.Cancel(cancelledAt);
 
         // Assert
-        Assert.False(reservation.IsActive);
-        Assert.Null(reservation.CurrentVehicleId);
+        reservation.Status.ShouldBe(ReservationStatus.Cancelled);
+        reservation.CancelledAt.ShouldBe(cancelledAt);
+        reservation.UpdatedAt.ShouldBe(cancelledAt);
+        reservation.CurrentVehicleId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Expire_ShouldMarkReservationExpiredAndDetachIt()
+    {
+        // Arrange
+        var reservation = CreateReservation();
+
+        // Act
+        reservation.Expire(WindowEnd);
+
+        // Assert
+        reservation.Status.ShouldBe(ReservationStatus.Expired);
+        reservation.CancelledAt.ShouldBeNull();
+        reservation.UpdatedAt.ShouldBe(WindowEnd);
+        reservation.CurrentVehicleId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Fulfil_ShouldMarkReservationFulfilledAndDetachIt()
+    {
+        // Arrange
+        var reservation = CreateReservation();
+        var fulfilledAt = Now.AddMinutes(5);
+
+        // Act
+        reservation.Fulfil(fulfilledAt);
+
+        // Assert
+        reservation.Status.ShouldBe(ReservationStatus.Fulfilled);
+        reservation.CancelledAt.ShouldBeNull();
+        reservation.UpdatedAt.ShouldBe(fulfilledAt);
+        reservation.CurrentVehicleId.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Cancel_WhenReservationIsNotActive_ShouldThrowBusinessRuleValidationException()
+    {
+        var reservation = CreateReservation();
+        reservation.Expire(WindowEnd);
+
+        Should.Throw<BusinessRuleValidationException>(() => reservation.Cancel(WindowEnd));
+        reservation.Status.ShouldBe(ReservationStatus.Expired);
+    }
+
+    private static Reservation CreateReservation()
+    {
+        return Reservation.CreateNew(Guid.NewGuid(), StartDate, Duration, Now, Guid.NewGuid());
     }
 }

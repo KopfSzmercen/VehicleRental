@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using VehicleRental.Rentals.Infrastructure;
 using VehicleRental.Rentals.Infrastructure.ReadModels;
 using VehicleRental.Vehicles.Infrastructure;
 using VehicleRental.Vehicles.Infrastructure.ReadModels;
@@ -23,5 +24,6 @@ internal sealed class AppReadDbContext(DbContextOptions<AppReadDbContext> option
         base.OnModelCreating(modelBuilder);
 
         VehicleModuleReadConfiguration.Configure(modelBuilder);
+        RentalsModuleReadConfiguration.Configure(modelBuilder);
     }
 }

@@ -146,5 +146,65 @@ public class BrowsingReservationsTests(TestWebApplication testWebApplication) : 
         result.Items.Count().ShouldBe(1);
         result.Items.First().UserId.ShouldNotBe(Guid.Empty);
         result.Items.First().VehicleId.ShouldBe(someUserReservationVehicleId);
+        result.Items.First().Status.ShouldBe(ReservationStatus.Active);
+    }
+
+    [Fact]
+    public async Task GivenStoredActiveReservationWhoseWindowHasPassed_BrowseReservations_ShouldShowItAsExpired()
+    {
+        // Arrange
+        var client = await testWebApplication
+            .CreateClient()
+            .SignInAsUserAsync(testWebApplication);
+
+        var userId = await testWebApplication.GetUserIdAsync("user@t.pl");
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+        var reservationId = await testWebApplication.SeedExpiredReservationAsync(vehicleId, userId);
+
+        // Act
+        var response = await client.GetAsync("/reservations?PageNumber=1&PageSize=10");
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var result = await response.Content
+            .ReadFromJsonAsync<PaginatedEntity<BrowseReservationsEndpoint.BrowseReservationItemResponse>>();
+
+        result.ShouldNotBeNull();
+        var item = result.Items.Single();
+        item.Id.ShouldBe(reservationId);
+        item.Status.ShouldBe(ReservationStatus.Expired);
+
+        // Browsing doesn't write: the stored row is still Active until the vehicle is used.
+        (await testWebApplication.GetReservationAsync(reservationId)).Status.ShouldBe(ReservationStatus.Active);
+    }
+
+    [Fact]
+    public async Task GivenCancelledReservation_BrowseReservations_ShouldShowItAsCancelled()
+    {
+        // Arrange
+        var client = await testWebApplication
+            .CreateClient()
+            .SignInAsUserAsync(testWebApplication);
+
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+        var createResponse = await client.PostAsJsonAsync("/reservations", new CreateReservationEndpoint.Request
+        {
+            VehicleId = vehicleId,
+            StartDate = DateTimeOffset.UtcNow.AddMinutes(3),
+            DurationInSeconds = 3600
+        });
+        createResponse.EnsureSuccessStatusCode();
+        var reservationId = await createResponse.Content.ReadFromJsonAsync<Guid>();
+        (await client.PutAsync($"/reservations/{reservationId}/cancel", null)).EnsureSuccessStatusCode();
+
+        // Act
+        var response = await client.GetAsync("/reservations?PageNumber=1&PageSize=10");
+
+        // Assert
+        var result = await response.Content
+            .ReadFromJsonAsync<PaginatedEntity<BrowseReservationsEndpoint.BrowseReservationItemResponse>>();
+
+        result.ShouldNotBeNull();
+        result.Items.Single().Status.ShouldBe(ReservationStatus.Cancelled);
     }
 }

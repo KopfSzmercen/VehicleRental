@@ -15,6 +15,7 @@ public static class ReservationsEndpointsExtensions
 
         group
             .MapEndpoint<CreateReservationEndpoint>()
-            .MapEndpoint<BrowseReservationsEndpoint>();
+            .MapEndpoint<BrowseReservationsEndpoint>()
+            .MapEndpoint<CancelReservationEndpoint>();
     }
 }

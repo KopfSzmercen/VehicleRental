@@ -11,4 +11,6 @@ internal interface IRentalsVehicleRepository
     Task DeleteAsync(RentalsVehicle rentalsVehicle, CancellationToken cancellationToken = default);
 
     Task<RentalsVehicle?> GetByRentalIdAsync(Guid rentalId, CancellationToken cancellationToken = default);
+
+    Task<RentalsVehicle?> GetByReservationIdAsync(Guid reservationId, CancellationToken cancellationToken = default);
 }

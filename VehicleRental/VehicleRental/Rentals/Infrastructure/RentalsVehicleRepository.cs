@@ -38,4 +38,14 @@ internal sealed class RentalsVehicleRepository(AppDbContext dbContext) : IRental
             .Include(x => x.Reservation)
             .FirstOrDefaultAsync(v => v.Rental != null && v.Rental.Id == rentalId, cancellationToken);
     }
+
+    public async Task<RentalsVehicle?> GetByReservationIdAsync(
+        Guid reservationId,
+        CancellationToken cancellationToken = default)
+    {
+        return await dbContext.RentalVehicles
+            .Include(x => x.Rental)
+            .Include(x => x.Reservation)
+            .FirstOrDefaultAsync(v => v.Reservation != null && v.Reservation.Id == reservationId, cancellationToken);
+    }
 }

@@ -16,5 +16,15 @@ internal static class RentalsModuleReadConfiguration
             b.Property(x => x.Status)
                 .HasConversion<string>();
         });
+
+        builder.Entity<ReservationReadModel>(b =>
+        {
+            b.ToTable("Reservations");
+
+            b.HasKey(r => r.Id);
+
+            b.Property(x => x.Status)
+                .HasConversion<string>();
+        });
     }
 }

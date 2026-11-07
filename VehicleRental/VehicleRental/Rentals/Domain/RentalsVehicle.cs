@@ -35,6 +35,8 @@ internal sealed class RentalsVehicle
         if (vehicleIsAvailable == false)
             throw new BusinessRuleValidationException(VehicleIsNotAvailableMessage);
 
+        ExpireReservationIfDue(now);
+
         if (Reservation is not null)
             throw new BusinessRuleValidationException("Vehicle is already reserved.");
 
@@ -45,10 +47,25 @@ internal sealed class RentalsVehicle
         UpdatedAt = now;
     }
 
-    public void CancelReservation(DateTimeOffset now)
+    public bool ExpireReservationIfDue(DateTimeOffset now)
     {
-        if (Reservation is null)
-            throw new BusinessRuleValidationException("Vehicle is not reserved.");
+        if (Reservation is null || !Reservation.IsExpired(now))
+            return false;
+
+        Reservation.Expire(now);
+        Reservation = null;
+        UpdatedAt = now;
+        return true;
+    }
+
+    public void CancelReservation(Guid reservationId, Guid userId, DateTimeOffset now)
+    {
+        if (Reservation is null
+            || Reservation.Id != reservationId
+            || Reservation.UserId != userId
+            || Reservation.Status != ReservationStatus.Active
+            || Reservation.IsExpired(now))
+            throw new BusinessRuleValidationException($"Reservation with ID {reservationId} does not exist.");
 
         Reservation.Cancel(now);
         UpdatedAt = now;
@@ -63,8 +80,19 @@ internal sealed class RentalsVehicle
         if (Rental is not null)
             throw new BusinessRuleValidationException("Vehicle is already rented.");
 
+        ExpireReservationIfDue(now);
+
         if (Reservation is not null)
-            throw new BusinessRuleValidationException("Vehicle is reserved.");
+        {
+            if (Reservation.UserId != rental.CustomerId)
+                throw new BusinessRuleValidationException("Vehicle is reserved.");
+
+            if (!Reservation.IsWithinWindow(rental.StartDate))
+                throw new BusinessRuleValidationException("Rental must start within the reservation window.");
+
+            Reservation.Fulfil(now);
+            Reservation = null;
+        }
 
         Rental = rental;
         UpdatedAt = now;

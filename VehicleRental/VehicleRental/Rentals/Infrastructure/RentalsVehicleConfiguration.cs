@@ -86,6 +86,10 @@ internal static class RentalsVehicleConfiguration
                 .HasConversion(
                     v => v.Value,
                     v => new ReservationDurationInSeconds(v));
+
+            b.Property(r => r.Status)
+                .IsRequired()
+                .HasConversion<string>();
         });
     }
 }

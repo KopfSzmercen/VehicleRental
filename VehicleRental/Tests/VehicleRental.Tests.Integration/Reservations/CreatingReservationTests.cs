@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using VehicleRental.Persistence;
+using VehicleRental.Rentals.Domain.Reservations;
 using VehicleRental.Rentals.Endpoints.Reservations;
 
 namespace VehicleRental.Tests.Integration.Reservations;
@@ -67,6 +68,34 @@ public class CreatingReservationTests(TestWebApplication testWebApplication) : I
 
             rentalVehicle.Reservation.ShouldBeNull();
         }
+    }
+
+    [Fact]
+    public async Task GivenVehicleWithExpiredReservation_CreateReservation_ShouldSucceedAndStoreOldOneAsExpired()
+    {
+        // Arrange
+        var client = await testWebApplication
+            .CreateClient()
+            .SignInAsAdminAsync(testWebApplication);
+
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+        var previousOwnerId = await testWebApplication.GetUserIdAsync("admin@admin.com");
+        var expiredReservationId = await testWebApplication.SeedExpiredReservationAsync(vehicleId, previousOwnerId);
+
+        // Act
+        var response = await client.PostAsJsonAsync("/reservations", ValidRequestFor(vehicleId));
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var newReservationId = await response.Content.ReadFromJsonAsync<Guid>();
+
+        var expiredReservation = await testWebApplication.GetReservationAsync(expiredReservationId);
+        expiredReservation.Status.ShouldBe(ReservationStatus.Expired);
+        expiredReservation.CurrentVehicleId.ShouldBeNull();
+
+        var newReservation = await testWebApplication.GetReservationAsync(newReservationId);
+        newReservation.Status.ShouldBe(ReservationStatus.Active);
+        newReservation.CurrentVehicleId.ShouldBe(vehicleId);
     }
 
     private static CreateReservationEndpoint.Request ValidRequestFor(Guid vehicleId)
