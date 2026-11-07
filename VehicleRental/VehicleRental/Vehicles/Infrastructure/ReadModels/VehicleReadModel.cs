@@ -12,8 +12,6 @@ internal sealed record VehicleReadModel : IEntityWithId
 
     public VehicleStatus Status { get; init; }
 
-    public bool IsAvailableForRental { get; init; }
-
     public DateTime CreatedAt { get; init; }
 
     public DateTime? UpdatedAt { get; init; }

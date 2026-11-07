@@ -41,7 +41,6 @@ public class VehicleTests
         vehicle.CurrentGeoLocalization.ShouldBe(geoLocalization);
         vehicle.CreatedAt.ShouldBe(_now);
         vehicle.UpdatedAt.ShouldBeNull();
-        vehicle.IsAvailableForRental.ShouldBeFalse();
         vehicle.LegalDocuments.ShouldBeEmpty();
     }
 
@@ -148,7 +147,6 @@ public class VehicleTests
 
         // Assert
         vehicle.Status.ShouldBe(VehicleStatus.Archived);
-        vehicle.IsAvailableForRental.ShouldBeFalse();
         vehicle.UpdatedAt.ShouldBe(archiveTime);
         vehicle.CurrentGeoLocalization.ShouldBeNull();
     }

@@ -91,14 +91,14 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 DateTimeOffset.Now
             );
 
-            rentalVehicle.Rent(rental, DateTimeOffset.Now);
+            rentalVehicle.Rent(rental, true, DateTimeOffset.Now);
 
             var rentalVehicleOfOtherUser = RentalsVehicle.CreateNew(
                 vehicle2.Id,
                 DateTimeOffset.Now
             );
 
-            rentalVehicleOfOtherUser.Rent(rentalOfOtherUser, DateTimeOffset.Now);
+            rentalVehicleOfOtherUser.Rent(rentalOfOtherUser, true, DateTimeOffset.Now);
 
             await dbContext.RentalVehicles.AddRangeAsync(rentalVehicle, rentalVehicleOfOtherUser);
 
@@ -170,7 +170,7 @@ public class BrowsingRentalsTests(TestWebApplication testWebApplication) : IDisp
                 DateTimeOffset.Now
             );
 
-            vehicleRental.Rent(rental, DateTimeOffset.Now);
+            vehicleRental.Rent(rental, true, DateTimeOffset.Now);
 
             dbContext.RentalVehicles.Add(vehicleRental);
 

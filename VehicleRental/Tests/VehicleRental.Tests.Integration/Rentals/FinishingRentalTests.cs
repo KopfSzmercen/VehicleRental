@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using VehicleRental.Persistence;
-using VehicleRental.Rentals.Domain;
 using VehicleRental.Rentals.Endpoints;
 
 namespace VehicleRental.Tests.Integration.Rentals;
@@ -25,23 +24,11 @@ public class FinishingRentalTests(TestWebApplication testWebApplication) : IDisp
             .CreateClient()
             .SignInAsAdminAsync(testWebApplication);
 
-        var vehicle = RentalsVehicle.CreateNew(
-            Guid.NewGuid(),
-            DateTimeOffset.UtcNow
-        );
-
-        using (var scope = testWebApplication.Services.CreateScope())
-        {
-            var scopedServices = scope.ServiceProvider;
-            var dbContext = scopedServices.GetRequiredService<AppDbContext>();
-
-            dbContext.RentalVehicles.Add(vehicle);
-            await dbContext.SaveChangesAsync();
-        }
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
 
         var createRentalRequest = new CreateRentalEndpoint.Request
         {
-            VehicleId = vehicle.Id,
+            VehicleId = vehicleId,
             StartDate = DateTimeOffset.Now.AddMinutes(3),
             EndDate = DateTimeOffset.Now.AddDays(1)
         };
@@ -64,7 +51,7 @@ public class FinishingRentalTests(TestWebApplication testWebApplication) : IDisp
 
             var rentalVehicle = await dbContext.RentalVehicles
                 .Include(rv => rv.Rental)
-                .SingleAsync(rv => rv.Id == vehicle.Id);
+                .SingleAsync(rv => rv.Id == vehicleId);
 
             rentalVehicle.ShouldNotBeNull();
             rentalVehicle.Rental.ShouldBeNull();

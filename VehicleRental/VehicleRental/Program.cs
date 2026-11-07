@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using VehicleRental.Common;
+using VehicleRental.Common.ErrorHandling;
 using VehicleRental.Common.Messaging;
 using VehicleRental.Persistence;
 using VehicleRental.Rentals;
@@ -25,6 +26,7 @@ builder.Services.AddOpenApi("v1", options =>
     };
 });
 
+builder.Services.AddErrorHandling();
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddSingleton(TimeProvider.System);
 
@@ -35,6 +37,8 @@ builder.Services.AddRentalsModule(builder.Configuration);
 builder.Services.AddMessaging();
 
 var app = builder.Build();
+
+app.UseErrorHandling();
 
 if (app.Environment.IsDevelopment())
 {

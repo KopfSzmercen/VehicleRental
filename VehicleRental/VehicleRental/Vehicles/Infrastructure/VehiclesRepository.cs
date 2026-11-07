@@ -38,9 +38,11 @@ internal sealed class VehiclesRepository(AppDbContext dbContext) : IVehicleRepos
             .AnyAsync(v => v.RegistrationNumber == registrationNumber, cancellationToken);
     }
 
-    public async Task<bool> ExistsByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<VehicleStatus?> GetStatusByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await dbContext.Vehicles
-            .AnyAsync(v => v.Id == id, cancellationToken);
+            .Where(v => v.Id == id)
+            .Select(v => (VehicleStatus?)v.Status)
+            .SingleOrDefaultAsync(cancellationToken);
     }
 }

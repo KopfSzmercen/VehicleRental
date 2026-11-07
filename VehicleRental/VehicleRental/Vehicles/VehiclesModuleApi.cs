@@ -4,13 +4,15 @@ namespace VehicleRental.Vehicles;
 
 internal interface IVehiclesModuleApi
 {
-    public Task<bool> ExistsByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    public Task<bool> IsAvailableForRentalAsync(Guid vehicleId, CancellationToken cancellationToken = default);
 }
 
 internal sealed class VehiclesModuleApi(IVehicleRepository vehiclesRepository) : IVehiclesModuleApi
 {
-    public async Task<bool> ExistsByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<bool> IsAvailableForRentalAsync(Guid vehicleId, CancellationToken cancellationToken = default)
     {
-        return await vehiclesRepository.ExistsByIdAsync(id, cancellationToken);
+        var status = await vehiclesRepository.GetStatusByIdAsync(vehicleId, cancellationToken);
+
+        return status is VehicleStatus.Available;
     }
 }

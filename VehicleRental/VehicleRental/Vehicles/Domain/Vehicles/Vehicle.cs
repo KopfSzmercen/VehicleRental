@@ -26,8 +26,6 @@ internal sealed class Vehicle
 
     public IReadOnlyList<VehicleLegalDocument> LegalDocuments => _legalDocuments.AsReadOnly();
 
-    public bool IsAvailableForRental { get; private set; }
-
     public static Vehicle CreateNew(
         string name,
         string registrationNumber,
@@ -53,7 +51,6 @@ internal sealed class Vehicle
             Status = VehicleStatus.InVerification,
             CurrentGeoLocalization = geoLocalization,
             CreatedAt = now,
-            IsAvailableForRental = false,
             _legalDocuments = []
         };
     }
@@ -73,7 +70,6 @@ internal sealed class Vehicle
 
     public void Archive(DateTimeOffset now)
     {
-        IsAvailableForRental = false;
         Status = VehicleStatus.Archived;
         UpdatedAt = now;
         CurrentGeoLocalization = null;

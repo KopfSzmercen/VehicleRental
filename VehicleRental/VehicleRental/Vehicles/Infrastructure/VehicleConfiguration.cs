@@ -27,8 +27,6 @@ internal static class VehicleConfiguration
 
             b.OwnsOne(x => x.CurrentGeoLocalization);
 
-            b.Property(v => v.IsAvailableForRental).IsRequired();
-
             b.OwnsMany(x => x.LegalDocuments, legalDocument =>
             {
                 legalDocument.HasKey(x => x.Id);

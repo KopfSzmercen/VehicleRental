@@ -5,6 +5,8 @@ namespace VehicleRental.Rentals.Domain;
 
 internal sealed class RentalsVehicle
 {
+    private const string VehicleIsNotAvailableMessage = "Vehicle is not available for rental.";
+
     private RentalsVehicle()
     {
     }
@@ -28,8 +30,11 @@ internal sealed class RentalsVehicle
         };
     }
 
-    public void Reserve(Reservation reservation, DateTimeOffset now)
+    public void Reserve(Reservation reservation, bool vehicleIsAvailable, DateTimeOffset now)
     {
+        if (vehicleIsAvailable == false)
+            throw new BusinessRuleValidationException(VehicleIsNotAvailableMessage);
+
         if (Reservation is not null)
             throw new BusinessRuleValidationException("Vehicle is already reserved.");
 
@@ -50,8 +55,11 @@ internal sealed class RentalsVehicle
         Reservation = null;
     }
 
-    public void Rent(Rental rental, DateTimeOffset now)
+    public void Rent(Rental rental, bool vehicleIsAvailable, DateTimeOffset now)
     {
+        if (vehicleIsAvailable == false)
+            throw new BusinessRuleValidationException(VehicleIsNotAvailableMessage);
+
         if (Rental is not null)
             throw new BusinessRuleValidationException("Vehicle is already rented.");
 

@@ -1,9 +1,9 @@
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using VehicleRental.Persistence;
-using VehicleRental.Rentals.Domain;
 using VehicleRental.Rentals.Endpoints.Reservations;
 
 namespace VehicleRental.Tests.Integration.Reservations;
@@ -23,28 +23,9 @@ public class CreatingReservationTests(TestWebApplication testWebApplication) : I
             .CreateClient()
             .SignInAsAdminAsync(testWebApplication);
 
-        var vehicle = RentalsVehicle.CreateNew(
-            Guid.NewGuid(),
-            DateTimeOffset.UtcNow
-        );
+        var vehicleId = await testWebApplication.SeedAvailableVehicleAsync();
 
-        using (var scope = testWebApplication.Services.CreateScope())
-        {
-            var scopedServices = scope.ServiceProvider;
-            var dbContext = scopedServices.GetRequiredService<AppDbContext>();
-
-            dbContext.RentalVehicles.Add(vehicle);
-            await dbContext.SaveChangesAsync();
-        }
-
-        var createReservationRequest = new CreateReservationEndpoint.Request
-        {
-            VehicleId = vehicle.Id,
-            StartDate = DateTimeOffset.Now.AddMinutes(3),
-            DurationInSeconds = 3600
-        };
-
-        var response = await client.PostAsJsonAsync("/reservations", createReservationRequest);
+        var response = await client.PostAsJsonAsync("/reservations", ValidRequestFor(vehicleId));
         response.EnsureSuccessStatusCode();
 
         using (var assertScope = testWebApplication.Services.CreateScope())
@@ -53,11 +34,48 @@ public class CreatingReservationTests(TestWebApplication testWebApplication) : I
             var dbContext = scopedServices.GetRequiredService<AppDbContext>();
 
             var rentalVehicle = await dbContext.RentalVehicles
-                .Where(rv => rv.Id == vehicle.Id)
+                .Where(rv => rv.Id == vehicleId)
                 .Include(x => x.Reservation)
                 .SingleAsync();
 
             rentalVehicle.Reservation.ShouldNotBeNull();
         }
+    }
+
+    [Fact]
+    public async Task GivenVehicleInVerification_CreateReservation_ShouldReturnBadRequestAndNotSaveReservation()
+    {
+        var client = await testWebApplication
+            .CreateClient()
+            .SignInAsAdminAsync(testWebApplication);
+
+        var vehicleId = await testWebApplication.SeedVehicleInVerificationAsync();
+
+        var response = await client.PostAsJsonAsync("/reservations", ValidRequestFor(vehicleId));
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await response.Content.ReadFromJsonAsync<string>()).ShouldBe("Vehicle is not available for rental.");
+
+        using (var assertScope = testWebApplication.Services.CreateScope())
+        {
+            var dbContext = assertScope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+            var rentalVehicle = await dbContext.RentalVehicles
+                .Where(rv => rv.Id == vehicleId)
+                .Include(x => x.Reservation)
+                .SingleAsync();
+
+            rentalVehicle.Reservation.ShouldBeNull();
+        }
+    }
+
+    private static CreateReservationEndpoint.Request ValidRequestFor(Guid vehicleId)
+    {
+        return new CreateReservationEndpoint.Request
+        {
+            VehicleId = vehicleId,
+            StartDate = DateTimeOffset.Now.AddMinutes(3),
+            DurationInSeconds = 3600
+        };
     }
 }

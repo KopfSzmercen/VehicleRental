@@ -13,5 +13,5 @@ internal interface IVehicleRepository
     Task<bool> IsUniqueByRegistrationNumberAsync(string registrationNumber,
         CancellationToken cancellationToken = default);
 
-    Task<bool> ExistsByIdAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<VehicleStatus?> GetStatusByIdAsync(Guid id, CancellationToken cancellationToken = default);
 }

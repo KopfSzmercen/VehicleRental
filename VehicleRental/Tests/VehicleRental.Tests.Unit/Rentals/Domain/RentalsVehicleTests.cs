@@ -39,11 +39,33 @@ public class RentalsVehicleTests
 
 
         // Act
-        rentalsVehicle.Reserve(reservation, now);
+        rentalsVehicle.Reserve(reservation, true, now);
 
         // Assert
         rentalsVehicle.Reservation.ShouldNotBeNull();
         rentalsVehicle.UpdatedAt.ShouldBe(now);
+    }
+
+    [Fact]
+    public void Reserve_WhenVehicleIsNotAvailable_ShouldThrowBusinessRuleValidationException()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 12, 0, 0, TimeSpan.Zero);
+
+        var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), now);
+
+        var reservation = Reservation.CreateNew(
+            Guid.NewGuid(),
+            now.AddHours(1),
+            new ReservationDurationInSeconds(3600),
+            now,
+            Guid.NewGuid()
+        );
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Reserve(reservation, false, now))
+            .Message.ShouldBe("Vehicle is not available for rental.");
+        rentalsVehicle.Reservation.ShouldBeNull();
     }
 
     [Fact]
@@ -62,10 +84,10 @@ public class RentalsVehicleTests
             Guid.NewGuid()
         );
 
-        rentalsVehicle.Reserve(reservation, now);
+        rentalsVehicle.Reserve(reservation, true, now);
 
         // Act & Assert
-        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Reserve(reservation, now));
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Reserve(reservation, true, now));
     }
 
     [Fact]
@@ -93,10 +115,65 @@ public class RentalsVehicleTests
             Guid.NewGuid()
         );
 
-        rentalsVehicle.Rent(rental, now);
+        rentalsVehicle.Rent(rental, true, now);
 
         // Act & Assert
-        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Reserve(reservation, now));
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Reserve(reservation, true, now));
+    }
+
+    [Fact]
+    public void Reserve_WhenVehicleIsNotAvailableAndAlreadyReserved_ShouldThrowNotAvailableBusinessRuleValidationException()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 12, 0, 0, TimeSpan.Zero);
+
+        var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), now);
+
+        var reservation = Reservation.CreateNew(
+            Guid.NewGuid(),
+            now.AddHours(1),
+            new ReservationDurationInSeconds(3600),
+            now,
+            Guid.NewGuid()
+        );
+
+        rentalsVehicle.Reserve(reservation, true, now);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Reserve(reservation, false, now))
+            .Message.ShouldBe("Vehicle is not available for rental.");
+    }
+
+    [Fact]
+    public void Reserve_WhenVehicleIsNotAvailableAndAlreadyRented_ShouldThrowNotAvailableBusinessRuleValidationException()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 12, 0, 0, TimeSpan.Zero);
+
+        var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), now);
+
+        var rental = Rental.CreateNew(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            now.AddHours(1),
+            now.AddHours(2),
+            new Money(100, Currency.AUD),
+            now
+        );
+
+        var reservation = Reservation.CreateNew(
+            Guid.NewGuid(),
+            now.AddHours(1),
+            new ReservationDurationInSeconds(3600),
+            now,
+            Guid.NewGuid()
+        );
+
+        rentalsVehicle.Rent(rental, true, now);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Reserve(reservation, false, now))
+            .Message.ShouldBe("Vehicle is not available for rental.");
     }
 
     [Fact]
@@ -115,7 +192,7 @@ public class RentalsVehicleTests
             Guid.NewGuid()
         );
 
-        rentalsVehicle.Reserve(reservation, now);
+        rentalsVehicle.Reserve(reservation, true, now);
 
         // Act
         rentalsVehicle.CancelReservation(now);
@@ -155,11 +232,90 @@ public class RentalsVehicleTests
         );
 
         // Act
-        rentalsVehicle.Rent(rental, now);
+        rentalsVehicle.Rent(rental, true, now);
 
         // Assert
         rentalsVehicle.Rental.ShouldNotBeNull();
         rentalsVehicle.UpdatedAt.ShouldBe(now);
+    }
+
+    [Fact]
+    public void Rent_WhenVehicleIsNotAvailable_ShouldThrowBusinessRuleValidationException()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 12, 0, 0, TimeSpan.Zero);
+
+        var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), now);
+
+        var rental = Rental.CreateNew(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            now.AddHours(1),
+            now.AddHours(2),
+            new Money(100, Currency.AUD),
+            now
+        );
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Rent(rental, false, now))
+            .Message.ShouldBe("Vehicle is not available for rental.");
+        rentalsVehicle.Rental.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Rent_WhenVehicleIsNotAvailableAndAlreadyRented_ShouldThrowNotAvailableBusinessRuleValidationException()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 12, 0, 0, TimeSpan.Zero);
+
+        var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), now);
+
+        var rental = Rental.CreateNew(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            now.AddHours(1),
+            now.AddHours(2),
+            new Money(100, Currency.AUD),
+            now
+        );
+
+        rentalsVehicle.Rent(rental, true, now);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Rent(rental, false, now))
+            .Message.ShouldBe("Vehicle is not available for rental.");
+    }
+
+    [Fact]
+    public void Rent_WhenVehicleIsNotAvailableAndReserved_ShouldThrowNotAvailableBusinessRuleValidationException()
+    {
+        // Arrange
+        var now = new DateTimeOffset(2023, 10, 1, 12, 0, 0, TimeSpan.Zero);
+
+        var rentalsVehicle = RentalsVehicle.CreateNew(Guid.NewGuid(), now);
+
+        var reservation = Reservation.CreateNew(
+            Guid.NewGuid(),
+            now.AddHours(1),
+            new ReservationDurationInSeconds(3600),
+            now,
+            Guid.NewGuid()
+        );
+
+        var rental = Rental.CreateNew(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            now.AddHours(1),
+            now.AddHours(2),
+            new Money(100, Currency.AUD),
+            now
+        );
+
+        rentalsVehicle.Reserve(reservation, true, now);
+
+        // Act & Assert
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Rent(rental, false, now))
+            .Message.ShouldBe("Vehicle is not available for rental.");
     }
 
     [Fact]
@@ -179,10 +335,10 @@ public class RentalsVehicleTests
             now
         );
 
-        rentalsVehicle.Rent(rental, now);
+        rentalsVehicle.Rent(rental, true, now);
 
         // Act & Assert
-        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Rent(rental, now));
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Rent(rental, true, now));
     }
 
     [Fact]
@@ -210,10 +366,10 @@ public class RentalsVehicleTests
             now
         );
 
-        rentalsVehicle.Reserve(reservation, now);
+        rentalsVehicle.Reserve(reservation, true, now);
 
         // Act & Assert
-        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Rent(rental, now));
+        Should.Throw<BusinessRuleValidationException>(() => rentalsVehicle.Rent(rental, true, now));
     }
 
     [Fact]
@@ -233,7 +389,7 @@ public class RentalsVehicleTests
             now
         );
 
-        rentalsVehicle.Rent(rental, now);
+        rentalsVehicle.Rent(rental, true, now);
 
         // Act
         rentalsVehicle.CompleteRental(now);

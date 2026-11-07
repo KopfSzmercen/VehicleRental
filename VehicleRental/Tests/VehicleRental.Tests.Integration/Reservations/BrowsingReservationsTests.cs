@@ -71,8 +71,8 @@ public class BrowsingReservationsTests(TestWebApplication testWebApplication) : 
                 createdOtherUser!.Id
             );
 
-            vehicle1.Reserve(currentUserReservation, DateTimeOffset.UtcNow);
-            vehicle2.Reserve(otherUserReservation, DateTimeOffset.UtcNow);
+            vehicle1.Reserve(currentUserReservation, true, DateTimeOffset.UtcNow);
+            vehicle2.Reserve(otherUserReservation, true, DateTimeOffset.UtcNow);
 
             await dbContext.SaveChangesAsync();
         }
@@ -130,7 +130,7 @@ public class BrowsingReservationsTests(TestWebApplication testWebApplication) : 
             );
 
             someUserReservationVehicleId = userReservation.VehicleId;
-            vehicle1.Reserve(userReservation, DateTimeOffset.UtcNow);
+            vehicle1.Reserve(userReservation, true, DateTimeOffset.UtcNow);
             await dbContext.SaveChangesAsync();
         }
 

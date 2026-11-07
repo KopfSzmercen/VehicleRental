@@ -5,6 +5,7 @@ using VehicleRental.Common.Endpoints;
 using VehicleRental.Persistence;
 using VehicleRental.Rentals.Domain;
 using VehicleRental.Rentals.Domain.Reservations;
+using VehicleRental.Vehicles;
 
 namespace VehicleRental.Rentals.Endpoints.Reservations;
 
@@ -24,6 +25,7 @@ public sealed class CreateReservationEndpoint : IEndpoint
     > Handle(
         [FromBody] Request request,
         [FromServices] IRentalsVehicleRepository rentalsRepository,
+        [FromServices] IVehiclesModuleApi vehiclesModuleApi,
         [FromServices] IUnitOfWork unitOfWork,
         [FromServices] TimeProvider timeProvider,
         [FromServices] IHttpContextAccessor httpContextAccessor,
@@ -32,10 +34,15 @@ public sealed class CreateReservationEndpoint : IEndpoint
     {
         var userId = httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value!;
 
+        // 3.2 Wczytaj pojazd
         var rentalVehicle = await rentalsRepository.GetByIdAsync(request.VehicleId, cancellationToken);
 
         if (rentalVehicle is null) return TypedResults.BadRequest("Vehicle not found.");
 
+        var vehicleIsAvailable =
+            await vehiclesModuleApi.IsAvailableForRentalAsync(rentalVehicle.Id, cancellationToken);
+
+        // 3.3 Utwórz rezerwację
         var reservation = Reservation.CreateNew(
             rentalVehicle.Id,
             request.StartDate,
@@ -44,8 +51,10 @@ public sealed class CreateReservationEndpoint : IEndpoint
             Guid.Parse(userId)
         );
 
-        rentalVehicle.Reserve(reservation, timeProvider.GetUtcNow().ToUniversalTime());
+        // 3.4 Zarezerwuj pojazd
+        rentalVehicle.Reserve(reservation, vehicleIsAvailable, timeProvider.GetUtcNow().ToUniversalTime());
 
+        // 3.5 Zapisz rezerwację
         await rentalsRepository.UpdateAsync(rentalVehicle, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

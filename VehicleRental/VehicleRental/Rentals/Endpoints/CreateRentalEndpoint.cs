@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using VehicleRental.Common.Endpoints;
 using VehicleRental.Persistence;
 using VehicleRental.Rentals.Domain;
+using VehicleRental.Vehicles;
 
 namespace VehicleRental.Rentals.Endpoints;
 
@@ -24,6 +25,7 @@ internal sealed class CreateRentalEndpoint : IEndpoint
     >> Handle(
         [FromBody] Request request,
         [FromServices] IRentalsVehicleRepository rentalsRepository,
+        [FromServices] IVehiclesModuleApi vehiclesModuleApi,
         [FromServices] IHttpContextAccessor httpContextAccessor,
         [FromServices] IUnitOfWork unitOfWork,
         [FromServices] TimeProvider timeProvider,
@@ -31,10 +33,15 @@ internal sealed class CreateRentalEndpoint : IEndpoint
     {
         var userId = httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value!;
 
+        // 4.2 Wczytaj pojazd
         var rentalVehicle = await rentalsRepository.GetByIdAsync(request.VehicleId, cancellationToken);
 
         if (rentalVehicle is null) return TypedResults.BadRequest("Vehicle not found.");
 
+        var vehicleIsAvailable =
+            await vehiclesModuleApi.IsAvailableForRentalAsync(rentalVehicle.Id, cancellationToken);
+
+        // 4.3 Utwórz wynajem
         var rental = Rental.CreateNew(
             rentalVehicle.Id,
             Guid.Parse(userId),
@@ -44,7 +51,10 @@ internal sealed class CreateRentalEndpoint : IEndpoint
             timeProvider.GetUtcNow().ToUniversalTime()
         );
 
-        rentalVehicle.Rent(rental, timeProvider.GetUtcNow().ToUniversalTime());
+        // 4.4 Wynajmij pojazd
+        rentalVehicle.Rent(rental, vehicleIsAvailable, timeProvider.GetUtcNow().ToUniversalTime());
+
+        // 4.5 Zapisz wynajem
         await rentalsRepository.UpdateAsync(rentalVehicle, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

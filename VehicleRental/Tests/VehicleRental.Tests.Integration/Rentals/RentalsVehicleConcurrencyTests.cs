@@ -61,7 +61,7 @@ public class RentalsVehicleConcurrencyTests(TestWebApplication testWebApplicatio
             }
 
 
-            rentalVehicle!.Rent(rental, DateTimeOffset.Now.AddMinutes(10));
+            rentalVehicle!.Rent(rental, true, DateTimeOffset.Now.AddMinutes(10));
 
             var unitOfWork = scopedServices.GetRequiredService<IUnitOfWork>();
 
