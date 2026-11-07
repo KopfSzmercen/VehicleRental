@@ -1,7 +1,7 @@
 namespace VehicleRental.Rentals.Domain.Payments;
 
-// Port to the external payment gateway ("Bramka płatności"), owned by the Rentals module and expressed in its
-// own types, so the external system's model never reaches the domain.
+// Port to the external payment gateway, owned by the Rentals module and expressed in its own types,
+// so the external system's model never reaches the domain.
 // Implementations throw PaymentGatewayUnavailableException when the gateway can't be reached.
 internal interface IPaymentGateway
 {

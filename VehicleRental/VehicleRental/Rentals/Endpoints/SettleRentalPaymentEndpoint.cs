@@ -31,7 +31,7 @@ internal sealed class SettleRentalPaymentEndpoint : IEndpoint
     {
         var userIdString = httpContextAccessor.HttpContext?.User.FindFirst("UserId")!.Value!;
 
-        // 4.10 Wczytaj zakończony wynajem: only completed rentals are found, so an active one is "does not exist".
+        // Only completed rentals are found, so an active one is "does not exist".
         var rental = await completedRentalsRepository.GetByIdAsync(rentalId, cancellationToken);
 
         if (rental is null || rental.CustomerId != Guid.Parse(userIdString))
@@ -42,18 +42,17 @@ internal sealed class SettleRentalPaymentEndpoint : IEndpoint
         if (!rental.HasOutstandingPayment)
             return TypedResults.BadRequest("Rental has no outstanding payment.");
 
-        // 4.11 Obciąż klienta: the only external call, made before the local transaction. The rental id is the
-        // idempotency key, the same one as at finish; a declined charge doesn't use it up, so settling can retry.
+        // The only external call, made before the local transaction. The rental id is the idempotency key,
+        // the same one as at finish; a declined charge doesn't use it up, so settling can retry.
         var chargeResult = await paymentGateway.ChargeAsync(
             rental.CustomerId,
             rental.Price,
             idempotencyKey: rental.Id,
             cancellationToken);
 
-        // 4.12 Ureguluj należność: a declined charge throws "Payment declined." and nothing is saved.
+        // A declined charge throws "Payment declined." and nothing is saved.
         rental.SettlePayment(chargeResult, timeProvider.GetUtcNow().ToUniversalTime());
 
-        // 4.13 Zapisz uregulowanie
         await completedRentalsRepository.UpdateAsync(rental, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

@@ -41,7 +41,7 @@ internal sealed class Rental
 
     public DateTimeOffset? PaidAt { get; private set; }
 
-    // Outstanding payment ("należność"): the price of a completed rental whose charge was declined.
+    // Outstanding payment: the price of a completed rental whose charge was declined.
     public bool HasOutstandingPayment =>
         Status == RentalStatus.Completed && PaymentStatus == Domain.PaymentStatus.Unpaid;
 

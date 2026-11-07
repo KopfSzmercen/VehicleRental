@@ -30,7 +30,6 @@ internal sealed class CancelReservationEndpoint : IEndpoint
         var now = timeProvider.GetUtcNow().ToUniversalTime();
         var notFound = TypedResults.NotFound($"Reservation with ID {reservationId} does not exist.");
 
-        // 3.6 Wczytaj rezerwację
         var rentalVehicle = await rentalsVehicleRepository.GetByReservationIdAsync(reservationId, cancellationToken);
 
         if (rentalVehicle is not null && rentalVehicle.ExpireReservationIfDue(now))
@@ -40,13 +39,11 @@ internal sealed class CancelReservationEndpoint : IEndpoint
             return notFound;
         }
 
-        // 3.7 Anuluj rezerwację
         if (rentalVehicle?.Reservation is null || rentalVehicle.Reservation.UserId != userId)
             return notFound;
 
         rentalVehicle.CancelReservation(reservationId, userId, now);
 
-        // 3.8 Zapisz anulowanie
         await rentalsVehicleRepository.UpdateAsync(rentalVehicle, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);

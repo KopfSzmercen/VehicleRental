@@ -36,7 +36,6 @@ internal sealed class CreateRentalEndpoint : IEndpoint
     {
         var userId = httpContextAccessor.HttpContext?.User.FindFirst("UserId")?.Value!;
 
-        // 4.2 Wczytaj pojazd
         var rentalVehicle = await rentalsRepository.GetByIdAsync(request.VehicleId, cancellationToken);
 
         if (rentalVehicle is null) return TypedResults.BadRequest("Vehicle not found.");
@@ -46,11 +45,9 @@ internal sealed class CreateRentalEndpoint : IEndpoint
 
         var customerId = Guid.Parse(userId);
 
-        // 4.2 Wczytaj zadłużenie klienta
         var customerHasUnpaidRentals =
             await completedRentalsRepository.HasUnpaidRentalsAsync(customerId, cancellationToken);
 
-        // 4.3 Utwórz wynajem
         var walletBalance = await paymentGateway.GetBalanceAsync(customerId, cancellationToken);
 
         var rental = Rental.CreateNew(
@@ -63,10 +60,8 @@ internal sealed class CreateRentalEndpoint : IEndpoint
             timeProvider.GetUtcNow().ToUniversalTime()
         );
 
-        // 4.4 Wynajmij pojazd
         rentalVehicle.Rent(rental, vehicleIsAvailable, timeProvider.GetUtcNow().ToUniversalTime());
 
-        // 4.5 Zapisz wynajem
         await rentalsRepository.UpdateAsync(rentalVehicle, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
