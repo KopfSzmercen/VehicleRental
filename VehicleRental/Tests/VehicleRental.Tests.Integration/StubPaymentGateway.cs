@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using VehicleRental.Common.ErrorHandling;
 using VehicleRental.Rentals.Domain;
 using VehicleRental.Rentals.Domain.Payments;
 
@@ -10,7 +11,7 @@ internal sealed class StubPaymentGateway : IPaymentGateway
 {
     private static readonly Money DefaultBalance = new(1_000_000, Currency.USD);
 
-    private readonly ConcurrentDictionary<Guid, RecordedCharge> _charges = new();
+    private readonly ConcurrentDictionary<Guid, IdempotencyKey> _idempotencyKeys = new();
 
     // Wallet balance returned by GetBalanceAsync. High by default, so it covers any rental.
     public Money Balance { get; set; } = DefaultBalance;
@@ -25,7 +26,11 @@ internal sealed class StubPaymentGateway : IPaymentGateway
     public Func<Task>? OnCharge { get; set; }
 
     // Every charge that actually charged the customer. Repeated keys and declined charges aren't recorded.
-    public IReadOnlyCollection<RecordedCharge> Charges => _charges.Values.ToList();
+    public IReadOnlyCollection<RecordedCharge> Charges =>
+        _idempotencyKeys.Values
+            .Select(key => key.Charge)
+            .OfType<RecordedCharge>()
+            .ToList();
 
     public Task<Money> GetBalanceAsync(Guid customerId, CancellationToken cancellationToken = default)
     {
@@ -44,13 +49,19 @@ internal sealed class StubPaymentGateway : IPaymentGateway
 
         if (OnCharge is not null) await OnCharge();
 
-        if (_charges.ContainsKey(idempotencyKey)) return ChargeResult.Succeeded;
+        var key = _idempotencyKeys.GetOrAdd(idempotencyKey, _ => new IdempotencyKey());
 
-        if (ChargeResult == ChargeResult.Declined) return ChargeResult.Declined;
+        // Check, charge and record atomically per key, so concurrent calls with the same key charge once.
+        lock (key)
+        {
+            if (key.Charge is not null) return ChargeResult.Succeeded;
 
-        _charges.TryAdd(idempotencyKey, new RecordedCharge(customerId, amount, idempotencyKey));
+            if (ChargeResult == ChargeResult.Declined) return ChargeResult.Declined;
 
-        return ChargeResult.Succeeded;
+            key.Charge = new RecordedCharge(customerId, amount, idempotencyKey);
+
+            return ChargeResult.Succeeded;
+        }
     }
 
     public void Reset()
@@ -59,8 +70,13 @@ internal sealed class StubPaymentGateway : IPaymentGateway
         ChargeResult = ChargeResult.Succeeded;
         IsUnavailable = false;
         OnCharge = null;
-        _charges.Clear();
+        _idempotencyKeys.Clear();
     }
 
     internal sealed record RecordedCharge(Guid CustomerId, Money Amount, Guid IdempotencyKey);
+
+    private sealed class IdempotencyKey
+    {
+        public RecordedCharge? Charge { get; set; }
+    }
 }

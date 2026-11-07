@@ -10,7 +10,7 @@ internal sealed class FakePaymentGateway : IPaymentGateway
 {
     private const int MaxBalanceInUsd = 200;
 
-    private readonly ConcurrentDictionary<Guid, SuccessfulCharge> _successfulCharges = new();
+    private readonly ConcurrentDictionary<Guid, IdempotencyKey> _idempotencyKeys = new();
 
     public Task<Money> GetBalanceAsync(Guid customerId, CancellationToken cancellationToken = default)
     {
@@ -23,15 +23,22 @@ internal sealed class FakePaymentGateway : IPaymentGateway
         Guid idempotencyKey,
         CancellationToken cancellationToken = default)
     {
-        if (_successfulCharges.ContainsKey(idempotencyKey))
+        var key = _idempotencyKeys.GetOrAdd(idempotencyKey, _ => new IdempotencyKey());
+
+        // Check, charge and record atomically per key, so concurrent calls with the same key charge once.
+        lock (key)
+        {
+            if (key.HasSucceeded)
+                return Task.FromResult(ChargeResult.Succeeded);
+
+            // A declined charge leaves the key unused, so it can be retried.
+            if (DrawBalance() < amount)
+                return Task.FromResult(ChargeResult.Declined);
+
+            key.HasSucceeded = true;
+
             return Task.FromResult(ChargeResult.Succeeded);
-
-        if (DrawBalance() < amount)
-            return Task.FromResult(ChargeResult.Declined);
-
-        _successfulCharges.TryAdd(idempotencyKey, new SuccessfulCharge(customerId, amount));
-
-        return Task.FromResult(ChargeResult.Succeeded);
+        }
     }
 
     private static Money DrawBalance()
@@ -39,5 +46,8 @@ internal sealed class FakePaymentGateway : IPaymentGateway
         return new Money(Random.Shared.Next(0, MaxBalanceInUsd + 1), Currency.USD);
     }
 
-    private sealed record SuccessfulCharge(Guid CustomerId, Money Amount);
+    private sealed class IdempotencyKey
+    {
+        public bool HasSucceeded { get; set; }
+    }
 }

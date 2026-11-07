@@ -8,6 +8,9 @@ internal sealed class Rental
     private const int MinimumRentalDurationInSeconds = 60;
     private const int PricePerStartedHourInUsd = 10;
 
+    // Shared with Reservation.CreateNew, which applies the same debt rule.
+    internal const string CustomerHasUnpaidRentalsMessage = "Customer has unpaid rentals.";
+
     private Rental()
     {
     }
@@ -63,7 +66,7 @@ internal sealed class Rental
                 $"Rental duration must be at least {MinimumRentalDurationInSeconds} seconds.");
 
         if (customerHasUnpaidRentals)
-            throw new BusinessRuleValidationException("Customer has unpaid rentals.");
+            throw new BusinessRuleValidationException(CustomerHasUnpaidRentalsMessage);
 
         var price = PriceFor(startDate, endDate);
 
@@ -101,14 +104,9 @@ internal sealed class Rental
         Status = RentalStatus.Completed;
 
         if (chargeResult == ChargeResult.Succeeded)
-        {
-            PaymentStatus = Domain.PaymentStatus.Paid;
-            PaidAt = now;
-        }
+            MarkPaid(now);
         else
-        {
             PaymentStatus = Domain.PaymentStatus.Unpaid;
-        }
 
         CompletedAt = now;
         CurrentVehicleId = null;
@@ -124,6 +122,11 @@ internal sealed class Rental
         if (chargeResult == ChargeResult.Declined)
             throw new BusinessRuleValidationException("Payment declined.");
 
+        MarkPaid(now);
+    }
+
+    private void MarkPaid(DateTimeOffset now)
+    {
         PaymentStatus = Domain.PaymentStatus.Paid;
         PaidAt = now;
     }

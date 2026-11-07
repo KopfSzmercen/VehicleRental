@@ -45,6 +45,7 @@ public sealed class CreateReservationEndpoint : IEndpoint
 
         var customerId = Guid.Parse(userId);
 
+        // 3.2 Wczytaj zadłużenie klienta
         var customerHasUnpaidRentals =
             await completedRentalsRepository.HasUnpaidRentalsAsync(customerId, cancellationToken);
 

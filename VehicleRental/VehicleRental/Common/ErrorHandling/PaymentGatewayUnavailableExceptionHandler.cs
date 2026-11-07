@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Diagnostics;
-using VehicleRental.Rentals.Domain.Payments;
 
 namespace VehicleRental.Common.ErrorHandling;
 

@@ -197,7 +197,7 @@ public class RentalTests
     }
 
     [Fact]
-    public void Complete_WhenChargeSucceeded_ShouldCompleteAsPaidAndDetachFromVehicle()
+    public void Complete_ShouldCompleteAsPaidAndDetachFromVehicle_WhenChargeSucceeded()
     {
         // Arrange
         var rental = ActiveRental();
@@ -215,7 +215,7 @@ public class RentalTests
     }
 
     [Fact]
-    public void Complete_WhenChargeDeclined_ShouldCompleteAsUnpaidAndDetachFromVehicle()
+    public void Complete_ShouldCompleteAsUnpaidAndDetachFromVehicle_WhenChargeDeclined()
     {
         // Arrange
         var rental = ActiveRental();
@@ -272,7 +272,7 @@ public class RentalTests
     }
 
     [Fact]
-    public void SettlePayment_WhenUnpaidAndChargeSucceeded_ShouldMarkRentalPaid()
+    public void SettlePayment_ShouldMarkRentalPaid_WhenUnpaidAndChargeSucceeded()
     {
         // Arrange
         var rental = ActiveRental();
@@ -290,7 +290,7 @@ public class RentalTests
     }
 
     [Fact]
-    public void SettlePayment_WhenUnpaidAndChargeDeclined_ShouldThrowAndLeaveRentalUnpaid()
+    public void SettlePayment_ShouldThrowAndLeaveRentalUnpaid_WhenUnpaidAndChargeDeclined()
     {
         // Arrange
         var rental = ActiveRental();
@@ -307,7 +307,7 @@ public class RentalTests
     }
 
     [Fact]
-    public void SettlePayment_WhenAlreadyPaid_ShouldThrowNoOutstandingPayment()
+    public void SettlePayment_ShouldThrowNoOutstandingPayment_WhenAlreadyPaid()
     {
         // Arrange
         var rental = ActiveRental();
@@ -323,7 +323,7 @@ public class RentalTests
     }
 
     [Fact]
-    public void SettlePayment_WhenActive_ShouldThrowNoOutstandingPayment()
+    public void SettlePayment_ShouldThrowNoOutstandingPayment_WhenActive()
     {
         // Arrange
         var rental = ActiveRental();

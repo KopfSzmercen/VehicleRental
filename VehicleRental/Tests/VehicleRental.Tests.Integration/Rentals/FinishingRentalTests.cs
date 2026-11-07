@@ -7,6 +7,7 @@ using VehicleRental.Persistence;
 using VehicleRental.Rentals.Domain;
 using VehicleRental.Rentals.Domain.Payments;
 using VehicleRental.Rentals.Endpoints;
+using VehicleRental.Rentals.Endpoints.Reservations;
 
 namespace VehicleRental.Tests.Integration.Rentals;
 
@@ -87,7 +88,7 @@ public class FinishingRentalTests(TestWebApplication testWebApplication) : IDisp
     }
 
     [Fact]
-    public async Task GivenChargeDeclined_FinishRental_ShouldCompleteAsUnpaidAndFreeTheVehicle()
+    public async Task GivenChargeDeclined_FinishRental_ShouldCompleteAsUnpaidFreeTheVehicleAndBlockTheCustomer()
     {
         // Arrange
         var owner = await testWebApplication.CreateClient().SignInAsUserAsync(testWebApplication);
@@ -110,6 +111,28 @@ public class FinishingRentalTests(TestWebApplication testWebApplication) : IDisp
         testWebApplication.PaymentGateway.Charges.ShouldBeEmpty();
 
         await CreateTwoHourRentalAsync(otherClient, vehicleId);
+
+        var anotherVehicleId = await testWebApplication.SeedAvailableVehicleAsync();
+        var startDate = DateTimeOffset.UtcNow.AddMinutes(3);
+
+        var newRentalResponse = await owner.PostAsJsonAsync("/rentals", new CreateRentalEndpoint.Request
+        {
+            VehicleId = anotherVehicleId,
+            StartDate = startDate,
+            EndDate = startDate.AddHours(2)
+        });
+        newRentalResponse.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await newRentalResponse.Content.ReadFromJsonAsync<string>()).ShouldBe("Customer has unpaid rentals.");
+
+        var newReservationResponse = await owner.PostAsJsonAsync("/reservations",
+            new CreateReservationEndpoint.Request
+            {
+                VehicleId = anotherVehicleId,
+                StartDate = startDate,
+                DurationInSeconds = 3600
+            });
+        newReservationResponse.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        (await newReservationResponse.Content.ReadFromJsonAsync<string>()).ShouldBe("Customer has unpaid rentals.");
     }
 
     [Fact]

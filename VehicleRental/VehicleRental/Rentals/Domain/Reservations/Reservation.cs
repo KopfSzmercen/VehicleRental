@@ -43,7 +43,7 @@ internal sealed class Reservation
             throw new ArgumentException("Start date must be in the future.");
 
         if (customerHasUnpaidRentals)
-            throw new BusinessRuleValidationException("Customer has unpaid rentals.");
+            throw new BusinessRuleValidationException(Rental.CustomerHasUnpaidRentalsMessage);
 
         return new Reservation
         {

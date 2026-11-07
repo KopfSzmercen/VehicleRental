@@ -30,16 +30,7 @@ internal sealed record Money
         return new Money(left.Amount - right.Amount, left.Currency);
     }
 
-    public static bool operator >=(Money left, Money right)
-    {
-        return CompareAmounts(left, right) >= 0;
-    }
-
-    public static bool operator <=(Money left, Money right)
-    {
-        return CompareAmounts(left, right) <= 0;
-    }
-
+    // C# requires < and > to be defined together; only < is used.
     public static bool operator >(Money left, Money right)
     {
         return CompareAmounts(left, right) > 0;
